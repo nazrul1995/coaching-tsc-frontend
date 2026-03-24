@@ -1,50 +1,47 @@
 'use client';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
-import { loginUser } from '@/lib/api/auth';
+import { loginUser, type LoginPayload } from '@/lib/api/auth';
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
-
-type LoginData = {
-  email: string;
-  password: string;
-};
+import { useAuth } from '@/context/AuthContext';
 
 const Login = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginData>();
+  } = useForm<LoginPayload>();
 
   const router = useRouter();
+  const { login } = useAuth();
 
   const { mutate, isPending } = useMutation({
     mutationFn: loginUser,
 
     onSuccess: (data) => {
-      if (!data?.token) {
+      if (!data?.token || !data?.user) {
         Swal.fire({
           icon: 'error',
           title: 'Login Failed',
-          text: 'Token not received!',
+          text: 'Token or user data not received!',
         });
         return;
       }
 
-      // Save token
-      localStorage.setItem('token', data.token);
+      // Store in AuthContext and localStorage
+      login(data.token, data.user);
 
       // Success Alert
       Swal.fire({
         icon: 'success',
         title: 'Login Successful 🎉',
-        text: 'Welcome back!',
+        text: `Welcome back, ${data.user.name}!`,
         timer: 1500,
         showConfirmButton: false,
       });
 
-      // Redirect
+      // Redirect after delay
       setTimeout(() => {
         router.push('/');
       }, 1500);
@@ -55,12 +52,12 @@ const Login = () => {
       Swal.fire({
         icon: 'error',
         title: 'Login Failed',
-        text: error.response?.data?.message || 'Invalid credentials',
+        text: error.response?.data?.message || 'Invalid email or password',
       });
     },
   });
 
-  const onSubmit = (formData: LoginData) => {
+  const onSubmit = (formData: LoginPayload) => {
     mutate(formData);
   };
 
@@ -120,11 +117,19 @@ const Login = () => {
           <button
             type="submit"
             disabled={isPending}
-            className="w-full bg-[#adc6ff] hover:bg-[#adc6ff]/90 text-[#002e6a] font-semibold px-5 py-3 rounded-xl transition-all"
+            className="w-full bg-[#adc6ff] hover:bg-[#adc6ff]/90 text-[#002e6a] font-semibold px-5 py-3 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isPending ? 'Logging in...' : 'Login'}
           </button>
         </form>
+
+        {/* Sign up link */}
+        <p className="text-center text-sm text-white/70 mt-6">
+          Don't have an account?{' '}
+          <a href="/register" className="text-[#adc6ff] hover:text-[#adc6ff]/90 font-semibold">
+            Register here
+          </a>
+        </p>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { registerUser } from '@/lib/api/auth';
+import { registerUser, type RegisterPayload } from '@/lib/api/auth';
 import { uploadImageToImgBB } from '@/lib/imgUpload';
 import { Button } from '@base-ui/react';
 import { useMutation } from '@tanstack/react-query';
@@ -8,15 +8,10 @@ import { useRouter } from 'next/navigation';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
+import { useAuth } from '@/context/AuthContext';
 
-type FormData = {
-  name: string;
-  email: string;
-  password: string;
-  role: string;
-  image?: string;
+type FormData = RegisterPayload & {
   imageFile?: FileList;
-  error?: string;
 };
 
 const RegisterPage = () => {
@@ -27,58 +22,77 @@ const RegisterPage = () => {
   } = useForm<FormData>();
 
   const router = useRouter();
+  const { login } = useAuth();
 
   const { mutate, isPending } = useMutation({
     mutationFn: registerUser,
     onSuccess: (data) => {
-  console.log("SUCCESS DATA 👉", data);
+      if (!data?.token || !data?.user) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Registration Failed',
+          text: 'Token or user data not received',
+        });
+        return;
+      }
 
-  if (!data?.token) {
-    console.error("TOKEN NOT FOUND ❌", data);
-    return;
-  }
+      // Store in AuthContext and localStorage
+      login(data.token, data.user);
 
-  localStorage.setItem('token', data.token);
-  router.push('/');
-},
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onError: (error: any) => {
-  console.log("ERROR 👉", error.response?.data);
-},
-  });
-
- const onSubmit = async (formData: FormData) => {
-  try {
-    let imageUrl = formData.image;
-
-    // ✅ If user uploads file
-    if (formData.imageFile && formData.imageFile.length > 0) {
       Swal.fire({
-        title: 'Uploading image...',
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading(),
+        icon: 'success',
+        title: 'Registration Successful 🎉',
+        text: `Welcome ${data.user.name}!`,
+        timer: 1500,
+        showConfirmButton: false,
       });
 
-      imageUrl = await uploadImageToImgBB(formData.imageFile[0]);
+      setTimeout(() => {
+        router.push('/');
+      }, 1500);
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Registration Failed',
+        text: error.response?.data?.message || 'Something went wrong',
+      });
+    },
+  });
+
+  const onSubmit = async (formData: FormData) => {
+    try {
+      let imageUrl = formData.image || '';
+
+      // ✅ If user uploads file
+      if (formData.imageFile && formData.imageFile.length > 0) {
+        Swal.fire({
+          title: 'Uploading image...',
+          allowOutsideClick: false,
+          didOpen: () => Swal.showLoading(),
+        });
+
+        imageUrl = await uploadImageToImgBB(formData.imageFile[0]);
+      }
+
+      const payload: RegisterPayload = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: formData.role as 'student' | 'teacher' | 'guardian',
+        image: imageUrl,
+      };
+
+      mutate(payload);
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Image Upload Failed',
+        text: 'Try again',
+      });
     }
-
-    const payload = {
-      name: formData.name,
-      email: formData.email,
-      password: formData.password,
-      role: formData.role,
-      image: imageUrl, // ✅ final image
-    };
-
-    mutate(payload);
-  } catch (error) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Image Upload Failed',
-      text: 'Try again',
-    });
-  }
-};
+  };
 
   return (
     <div className="min-h-screen mt-20 flex items-center justify-center bg-[#0b1326] text-white px-6 py-20 relative overflow-hidden">
@@ -187,11 +201,19 @@ const RegisterPage = () => {
           <Button
             type="submit"
             disabled={isPending}
-            className="bg-[#adc6ff] hover:bg-[#adc6ff]/90 text-[#002e6a] font-semibold px-5 py-3 rounded-xl w-full transition-all"
+            className="bg-[#adc6ff] hover:bg-[#adc6ff]/90 text-[#002e6a] font-semibold px-5 py-3 rounded-xl w-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isPending ? 'Submitting...' : 'Submit'}
           </Button>
         </form>
+
+        {/* Login link */}
+        <p className="text-center text-sm text-white/70 mt-6">
+          Already have an account?{' '}
+          <a href="/login" className="text-[#adc6ff] hover:text-[#adc6ff]/90 font-semibold">
+            Login here
+          </a>
+        </p>
       </div>
     </div>
   );
