@@ -29,21 +29,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Initialize auth from localStorage on mount
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
+    try {
+      const storedToken = localStorage.getItem('token');
+      const storedUser = localStorage.getItem('user');
 
-    if (storedToken && storedUser) {
-      try {
+      if (storedToken && storedUser) {
+        const parsedUser = JSON.parse(storedUser);
         setToken(storedToken);
-        setUser(JSON.parse(storedUser));
-      } catch (error) {
-        console.error('Failed to parse stored user:', error);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        setUser(parsedUser);
       }
+    } catch (error) {
+      console.error('Failed to parse stored user:', error);
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   }, []);
 
   const login = (newToken: string, newUser: User) => {

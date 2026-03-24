@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
  */
 export const useHasRole = (requiredRoles: string | string[]) => {
   const { user } = useAuth();
-  
+  console.log('Checking roles:', { userRole: user?.role, requiredRoles });
   const roles = Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles];
   return user ? roles.includes(user.role) : false;
 };
@@ -15,6 +15,7 @@ export const useHasRole = (requiredRoles: string | string[]) => {
  */
 export const useIsTeacher = () => {
   const { user } = useAuth();
+  console.log('Checking if user is teacher:', { userRole: user?.role });
   return user?.role === 'teacher';
 };
 
@@ -23,6 +24,7 @@ export const useIsTeacher = () => {
  */
 export const useIsStudent = () => {
   const { user } = useAuth();
+  console.log('Checking if user is student:', { userRole: user?.role });
   return user?.role === 'student';
 };
 

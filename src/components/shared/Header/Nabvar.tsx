@@ -3,18 +3,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { LayoutDashboard, User, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, User, LogOut} from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
+import Image from 'next/image';
 
 const Navbar = () => {
   const { isLoggedIn, user, logout, isLoading } = useAuth();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const router = useRouter();
   const profileRef = useRef<HTMLDivElement>(null);
-
+  console.log(user);
   // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -82,9 +82,11 @@ const Navbar = () => {
                 className="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-white/10 transition-colors"
               >
                 {user.image ? (
-                  <img
+                  <Image
+                  width={50}
+                  height={50}
                     src={user.image}
-                    alt={user.name}
+                    alt={user.name || 'User avatar'}
                     className="w-8 h-8 rounded-full object-cover"
                   />
                 ) : (
