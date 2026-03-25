@@ -69,8 +69,8 @@ const Teachers = () => {
                   src={teacher.image}
                   alt={teacher.name}
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            fill
-                    
+                  fill
+
                   className="object-cover transition-transform duration-500 group-hover:scale-110"
                 />
 

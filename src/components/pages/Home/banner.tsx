@@ -47,18 +47,19 @@ const HeroBanner = () => {
           </p>
 
           {/* Buttons – exact styling from the HTML */}
-          <div className="flex flex-wrap gap-4 pt-2">
-            <Button 
-              size="lg" 
-              className="bg-[#adc6ff] hover:bg-[#adc6ff]/90 text-[#002e6a] text-xl font-bold px-12 py-7 rounded-2xl shadow-2xl transition-all hover:scale-105"
-              // onClick={() => window.scrollTo({ top: 900, behavior: 'smooth' })}
+          <div className="flex flex-wrap gap-6 pt-6 justify-center">
+            <Button
+              size="lg"
+              className="bg-[#adc6ff] hover:bg-[#adc6ff]/90 text-white text-xl font-bold px-12 py-6 rounded-3xl shadow-2xl transition-transform duration-300 hover:scale-105 hover:shadow-3xl"
+            // onClick={() => window.scrollTo({ top: 900, behavior: 'smooth' })}
             >
               Enroll Now
             </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="border-2 border-white/70 hover:bg-white/10 text-white text-xl font-bold px-12 py-7 rounded-2xl transition-all"
+
+            <Button
+              size="lg"
+              className="bg-[#6ffbbe] hover:bg-[#6ffbbe]/90 text-white text-xl font-bold px-12 py-6 rounded-3xl shadow-2xl transition-transform duration-300 hover:scale-105 hover:shadow-3xl"
+            // onClick={() => window.scrollTo({ top: 900, behavior: 'smooth' })}
             >
               View Courses
             </Button>
