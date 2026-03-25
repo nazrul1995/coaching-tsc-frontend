@@ -48,10 +48,10 @@ const HeroBanner = () => {
 
           {/* Buttons – exact styling from the HTML */}
           <div className="flex flex-wrap gap-4 pt-2">
-            {/* <Button 
+            <Button 
               size="lg" 
               className="bg-[#adc6ff] hover:bg-[#adc6ff]/90 text-[#002e6a] text-xl font-bold px-12 py-7 rounded-2xl shadow-2xl transition-all hover:scale-105"
-              onClick={() => window.scrollTo({ top: 900, behavior: 'smooth' })}
+              // onClick={() => window.scrollTo({ top: 900, behavior: 'smooth' })}
             >
               Enroll Now
             </Button>
@@ -61,7 +61,7 @@ const HeroBanner = () => {
               className="border-2 border-white/70 hover:bg-white/10 text-white text-xl font-bold px-12 py-7 rounded-2xl transition-all"
             >
               View Courses
-            </Button> */}
+            </Button>
           </div>
         </div>
 
