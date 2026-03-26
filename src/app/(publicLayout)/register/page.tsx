@@ -9,6 +9,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import { useAuth } from '@/context/AuthContext';
+import GoogleLoginButton from '@/components/button/GoogleLoginButton';
 
 type FormData = RegisterPayload & {
   imageFile?: FileList;
@@ -206,7 +207,10 @@ const RegisterPage = () => {
             {isPending ? 'Submitting...' : 'Submit'}
           </Button>
         </form>
+<div className="my-4 text-center">or</div>
 
+      {/* Google Login */}
+      <GoogleLoginButton />
         {/* Login link */}
         <p className="text-center text-sm text-white/70 mt-6">
           Already have an account?{' '}

@@ -12,7 +12,12 @@ export type LoginPayload = {
   email: string;
   password: string;
 };
-
+export type SocialPayload = {
+  name?: string;
+  email?: string;
+  image?: string;
+  credential?: string;
+};
 export type User = {
   _id: string;
   email: string;
@@ -37,6 +42,10 @@ export const registerUser = async (data: RegisterPayload): Promise<AuthResponse>
 
 export const loginUser = async (data: LoginPayload): Promise<AuthResponse> => {
   const res = await axiosSecure.post("/users/login", data);
+  return res.data;
+};
+export const socialLogin = async (data: SocialPayload): Promise<AuthResponse> => {
+  const res = await axiosSecure.post("/users/social-login", data);
   return res.data;
 };
 

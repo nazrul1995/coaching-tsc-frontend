@@ -106,7 +106,7 @@ const StudentResultPage = () => {
         {others.map((student) => (
           <div
             key={student.id}
-            className="p-5 rounded-2xl bg-gradient-to-b from-white/5 to-white/10 border border-white/10 hover:shadow-2xl hover:border-[#6ffbbe]/40 transition-all duration-300"
+            className="p-5 rounded-2xl bg-linear-to-b from-white/5 to-white/10 border border-white/10 hover:shadow-2xl hover:border-[#6ffbbe]/40 transition-all duration-300"
           >
             <div className="flex items-center gap-4 mb-3">
               {student.avatar ? (

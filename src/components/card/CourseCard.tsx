@@ -44,7 +44,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
             className="bg-blue-400 hover:bg-blue-500 text-white font-semibold transition-colors duration-200"
           >
            <Link href={`/courses/${course._id}`}>
-            View Details
+already enrolled
            </Link>
           </Button>
           <Button

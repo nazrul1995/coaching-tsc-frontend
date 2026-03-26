@@ -2,8 +2,7 @@
 
 import React from 'react'
 import Image from 'next/image'
-import { Tooltip } from '@/components/ui/tooltip'
-
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 const topStudents = [
   {
     name: 'Arafat Hossain',
@@ -169,19 +168,26 @@ const Leaderboard = () => {
         </div>
 
         {/* Mini Leaderboard (4th–10th) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {miniLeaderboard.map((student) => (
-            <Tooltip key={student.position} content={`${student.exam} • ${student.subject}`}>
-              <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/10 hover:scale-[1.02] transition cursor-pointer">
-                <span className="font-bold text-lg">#{student.position}</span>
-                <div className="flex flex-col ml-4">
-                  <span className="font-semibold">{student.name}</span>
-                  <span className="text-sm text-white/70">{student.marks}%</span>
-                </div>
-              </div>
-            </Tooltip>
-          ))}
-        </div>
+<TooltipProvider>
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    {miniLeaderboard.map((student) => (
+      <Tooltip key={student.position}>
+        <TooltipTrigger>
+          <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/10 hover:scale-[1.02] transition cursor-pointer">
+            <span className="font-bold text-lg">#{student.position}</span>
+            <div className="flex flex-col ml-4">
+              <span className="font-semibold">{student.name}</span>
+              <span className="text-sm text-white/70">{student.marks}%</span>
+            </div>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          {`${student.exam} • ${student.subject}`}
+        </TooltipContent>
+      </Tooltip>
+    ))}
+  </div>
+</TooltipProvider>
 
       </div>
     </section>

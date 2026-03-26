@@ -82,7 +82,7 @@ const Navbar = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0b1326]/90 backdrop-blur-md shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] border-b border-white/10">
-      <div className="max-w-[1440px] mx-auto px-6 md:px-8 h-20 flex items-center justify-between">
+      <div className="max-w-360 mx-auto px-6 md:px-8 h-20 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="text-3xl font-black tracking-tighter text-[#adc6ff] font-headline">
           Lens

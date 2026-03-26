@@ -2,17 +2,18 @@
 
 import axiosSecure from '@/lib/axiosSecure';
 import { useQuery } from '@tanstack/react-query';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import EnrollButton from '@/components/button/EnrollButton';
+import { TCourse } from '@/types/course';
 
 const CourseDetails = () => {
     const params = useParams();
-    const router = useRouter();
     const courseId = params?.id as string;
 
-    const { data: course, isLoading, isError } = useQuery({
+    const { data: course, isLoading, isError } = useQuery<TCourse>({
         queryKey: ['single-course', courseId],
         queryFn: async () => {
             const res = await axiosSecure.get(`/courses/${courseId}`);
@@ -44,16 +45,11 @@ const CourseDetails = () => {
                     fill
                     className="object-cover scale-105 blur-[2px]"
                 />
-
-                {/* overlay */}
                 <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-[#0b1326]" />
-
-                {/* content */}
                 <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6">
                     <h1 className="text-4xl md:text-6xl font-extrabold leading-tight max-w-4xl">
                         {course.title}
                     </h1>
-
                     <div className="flex gap-4 mt-4 text-white/70 flex-wrap justify-center">
                         <span>⭐ {course.rating}</span>
                         <span>👨‍🎓 {course.enrolledStudents} students</span>
@@ -75,24 +71,13 @@ const CourseDetails = () => {
                         </p>
                     </div>
 
-                    {/* Modules */}
-                    {course.modules && course.modules.length > 0 && (
-                        <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-                            <h2 className="text-2xl font-bold mb-5">Course Content</h2>
-
-                            <div className="grid md:grid-cols-2 gap-4">
-                                {course.modules.map((mod: string, idx: number) => (
-                                    <div
-                                        key={idx}
-                                        className="flex items-center gap-3 p-4 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 transition"
-                                    >
-                                        <span className="text-green-400">✔</span>
-                                        <span className="text-white/90">{mod}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+                    {/* Modules Placeholder */}
+                    <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                        <h2 className="text-2xl font-bold mb-5">Course Content</h2>
+                        <p className="text-white/80">
+                            This course has {course.totalModules} modules.
+                        </p>
+                    </div>
                 </div>
 
                 {/* RIGHT SIDEBAR */}
@@ -113,7 +98,6 @@ const CourseDetails = () => {
                             <span className="text-3xl font-extrabold text-green-400">
                                 ৳{course.price}
                             </span>
-
                             {course.rating >= 4.5 && (
                                 <span className="bg-yellow-400 text-black text-xs font-bold px-3 py-1 rounded-full">
                                     Top Rated
@@ -129,15 +113,10 @@ const CourseDetails = () => {
                                     className="bg-blue-400 hover:bg-blue-500 text-white font-semibold transition-colors duration-200"
                                 >
                                     <Link href={`/courses/${course._id}`}>
-                                        View Details
+                                        Already enrolled
                                     </Link>
                                 </Button>
-                                <Button
-                                    size="sm"
-                                    className="bg-green-400 hover:bg-green-500 text-white font-semibold transition-colors duration-200"
-                                >
-                                    Enroll
-                                </Button>
+                                <EnrollButton course={course} />
                             </div>
                         </div>
                     </div>
