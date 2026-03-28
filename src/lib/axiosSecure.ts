@@ -11,7 +11,7 @@ const axiosSecure = axios.create({
 axiosSecure.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
-
+    console.log('Attaching token to request:', token); // Debugging log
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

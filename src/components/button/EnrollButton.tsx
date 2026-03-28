@@ -1,17 +1,18 @@
 import React from 'react';
 import { TCourse } from '@/types/course';
 import { usePathname, useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 interface EnrollButtonProps {
   course: TCourse;
 }
 
 const EnrollButton: React.FC<EnrollButtonProps> = ({ course }) => {
-    const isLogin = true; // Replace with actual login state
-    const router = useRouter();
-    const path = usePathname()
+  const {user } = useAuth();
+  const router = useRouter();
+  const path = usePathname();
   const handleEnroll = () => {
-    if (!isLogin) {
+    if (user) {
         alert(`Enrolling in course: ${course.title}`);
     }  else {
         router.push(`/login?callbackUrl=${path}`);

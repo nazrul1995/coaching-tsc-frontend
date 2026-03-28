@@ -2,7 +2,7 @@
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
 import { loginUser, type LoginPayload } from '@/lib/api/auth';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Swal from 'sweetalert2';
 import { useAuth } from '@/context/AuthContext';
 
@@ -15,7 +15,8 @@ const Login = () => {
 
   const router = useRouter();
   const { login } = useAuth();
-
+const params = useSearchParams();
+const callbackUrl = params.get('callbackUrl') || '/';
   const { mutate, isPending } = useMutation({
     mutationFn: loginUser,
 
@@ -29,7 +30,6 @@ const Login = () => {
         return;
       }
 
-      // Store in AuthContext and localStorage
       login(data.token, data.user);
 
       // Success Alert
@@ -43,8 +43,9 @@ const Login = () => {
 
       // Redirect after delay
       setTimeout(() => {
-        router.push('/');
+        router.push(callbackUrl);
       }, 1500);
+
     },
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -52,7 +53,7 @@ const Login = () => {
       Swal.fire({
         icon: 'error',
         title: 'Login Failed',
-        text: error.response?.data?.message || 'Invalid email or password',
+        text: error  .response?.data?.message || 'Invalid email or password',
       });
     },
   });

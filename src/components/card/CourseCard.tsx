@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { TCourse } from '@/types/course';
 import Link from 'next/link';
+import EnrollButton from '../button/EnrollButton';
 
 interface CourseCardProps {
   course: TCourse;
@@ -11,7 +12,7 @@ interface CourseCardProps {
 
 const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
   return (
-    <div className="relative flex flex-col p-5 rounded-2xl bg-gradient-to-b from-white/5 to-white/10 border border-white/10 hover:shadow-lg hover:border-blue-400 transition-all duration-300">
+    <div className="relative flex flex-col p-5 rounded-2xl bg-linear-to-b from-white/5 to-white/10 border border-white/10 hover:shadow-lg hover:border-blue-400 transition-all duration-300">
       {/* Thumbnail */}
       <div className="relative w-full h-40 mb-4 rounded-xl overflow-hidden shadow-sm">
         <Image
@@ -39,20 +40,15 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
       <div className="flex justify-between items-center gap-2 mt-auto">
         <span className="text-green-400 font-bold text-lg">৳{course.price}</span>
         <div className="flex gap-2">
-          <Button 
+          <Button
             size="sm"
             className="bg-blue-400 hover:bg-blue-500 text-white font-semibold transition-colors duration-200"
           >
-           <Link href={`/courses/${course._id}`}>
-already enrolled
-           </Link>
+            <Link href={`/courses/${course._id}`}>
+              already enrolled
+            </Link>
           </Button>
-          <Button
-            size="sm"
-            className="bg-green-400 hover:bg-green-500 text-white font-semibold transition-colors duration-200"
-          >
-            Enroll
-          </Button>
+          <EnrollButton course={course}></EnrollButton>
         </div>
       </div>
 

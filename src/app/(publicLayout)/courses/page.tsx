@@ -14,7 +14,7 @@ const Courses = () => {
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
   const [page, setPage] = useState(1);
 
-  const limit = 5;
+  const limit = 6;
 
   // Debounce search
   useEffect(() => {
