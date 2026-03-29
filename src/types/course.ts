@@ -8,4 +8,5 @@ export interface TCourse {
   enrolledStudents: number;
   rating: number;
   totalModules: number,
+  creatorEmail: string;
 }

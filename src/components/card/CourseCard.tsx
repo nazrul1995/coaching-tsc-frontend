@@ -40,14 +40,6 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
       <div className="flex justify-between items-center gap-2 mt-auto">
         <span className="text-green-400 font-bold text-lg">৳{course.price}</span>
         <div className="flex gap-2">
-          <Button
-            size="sm"
-            className="bg-blue-400 hover:bg-blue-500 text-white font-semibold transition-colors duration-200"
-          >
-            <Link href={`/courses/${course._id}`}>
-              already enrolled
-            </Link>
-          </Button>
           <EnrollButton course={course}></EnrollButton>
         </div>
       </div>

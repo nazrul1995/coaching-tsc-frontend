@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -12,16 +11,18 @@ export function AppSidebar() {
   const { user, logout } = useAuth();
   const [active, setActive] = useState("overview");
 
-  const handleLogout = () => {
-    logout();
-  };
-
-  // Sidebar menu items
+  const handleLogout = () => logout();
+console.log("Rendering AppSidebar with user:", user); // Debugging log
   const menuItems = [
-    { label: "Overview", icon: <LayoutDashboard size={20} />, href: "/dashboard", key: "overview" },
-    { label: "My Courses", icon: <FileText size={20} />, href: "/dashboard/course-management", key: "courses" },
-    { label: "Schedule", icon: <Calendar size={20} />, href: "/dashboard/schedule", key: "schedule" },
-    { label: "Profile", icon: <User size={20} />, href: "/dashboard/profile", key: "profile" },
+    { label: "Overview", href: "/dashboard", key: "overview", roles: ["admin", "teacher", "student"], icon: <LayoutDashboard size={20} /> },
+    { label: "My Courses", href: "/dashboard/course-management", key: "courses", roles: ["teacher", "admin"], icon: <FileText size={20} /> },
+    { label: "My Enrolled Courses", href: "/dashboard/enrolled-courses", key: "enrolled-courses", roles: ["student"], icon: <FileText size={20} /> },
+    { label: "Add Course", href: "/dashboard/add-course", key: "add-course", roles: ["teacher", "admin"], icon: <FileText size={20} /> },
+    { label: "Schedule", href: "/dashboard/schedule", key: "schedule", roles: ["teacher", "student"], icon: <Calendar size={20} /> },
+    { label: "Profile", href: "/dashboard/profile", key: "profile", roles: ["admin", "teacher", "student"], icon: <User size={20} /> },
+    { label: "Admin Panel", href: "/admin", key: "admin", roles: ["admin"], icon: <User size={20} /> },
+    { label: "Teacher Panel", href: "/teacher", key: "teacher", roles: ["teacher"], icon: <FileText size={20} /> },
+    { label: "Student Panel", href: "/student", key: "student", roles: ["student"], icon: <FileText size={20} /> },
   ];
 
   return (
@@ -44,18 +45,20 @@ export function AppSidebar() {
         </div>
 
         <nav className="flex-1 px-4 mt-6 space-y-2">
-          {menuItems.map((item) => (
-            <Link
-              key={item.key}
-              href={item.href}
-              className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
-                active === item.key ? "bg-[#adc6ff]/20 text-[#adc6ff]" : "hover:bg-white/10"
-              }`}
-              onClick={() => setActive(item.key)}
-            >
-              {item.icon} {item.label}
-            </Link>
-          ))}
+          {menuItems
+            .filter(item => item.roles.includes(user?.role || ""))
+            .map(item => (
+              <Link
+                key={item.key}
+                href={item.href}
+                className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
+                  active === item.key ? "bg-[#adc6ff]/20 text-[#adc6ff]" : "hover:bg-white/10"
+                }`}
+                onClick={() => setActive(item.key)}
+              >
+                {item.icon} {item.label}
+              </Link>
+            ))}
         </nav>
 
         <div className="px-4 py-4 border-t border-white/10">
@@ -69,9 +72,8 @@ export function AppSidebar() {
         </div>
       </aside>
 
-      {/* Mobile Sidebar as Sheet */}
+      {/* Mobile Sidebar */}
       <Sheet>
-        {/* SheetTrigger is already a button, don't nest buttons */}
         <SheetTrigger className="md:hidden p-2 hover:bg-white/10 rounded-lg">
           <Menu size={24} />
         </SheetTrigger>
@@ -93,15 +95,17 @@ export function AppSidebar() {
           </div>
 
           <nav className="flex-1 px-4 mt-6 space-y-2">
-            {menuItems.map((item) => (
-              <Link
-                key={item.key}
-                href={item.href}
-                className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10"
-              >
-                {item.icon} {item.label}
-              </Link>
-            ))}
+            {menuItems
+              .filter(item => item.roles.includes(user?.role || ""))
+              .map(item => (
+                <Link
+                  key={item.key}
+                  href={item.href}
+                  className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10"
+                >
+                  {item.icon} {item.label}
+                </Link>
+              ))}
           </nav>
 
           <div className="px-4 py-4 border-t border-white/10">
