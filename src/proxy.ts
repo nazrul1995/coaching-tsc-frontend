@@ -1,46 +1,66 @@
-// middleware.ts
-import { getToken } from "next-auth/jwt";
+// middleware.ts  (Next.js root — not inside /app or /pages)
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import jwt from "jsonwebtoken";
 
 const roleBasedRoutes: Record<string, string[]> = {
   "/dashboard": ["admin", "teacher", "student"],
-  "/dashboard/course-management": ["teacher", "student"],
-  "/dashboard/schedule": ["teacher", "student"],
-  "/dashboard/profile": ["admin", "teacher", "student"],
-  "/admin": ["admin"],
-  "/teacher": ["teacher"],
-  "/student": ["student"],
+  "/admin":     ["admin"],
+  "/teacher":   ["teacher"],
+  "/student":   ["student"],
 };
 
-export async function proxy(req: NextRequest) {
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-  const pathname = req.nextUrl.pathname;
+export function proxy(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+  console.log(`Middleware: Checking access for ${pathname}`);
+  // Find the first protected prefix that matches
+  const matchedRoute = Object.keys(roleBasedRoutes).find((r) =>
+    pathname.startsWith(r)
+  );
 
-  // Check if route is protected
-  const routeRoles = Object.keys(roleBasedRoutes).find(route => pathname.startsWith(route));
+  console.log(`Matched route: ${matchedRoute}`);
 
-  if (!token && routeRoles) {
-    // Not logged in → redirect to login
-    return NextResponse.redirect(new URL(`/login?callbackUrl=${pathname}`, req.url));
+  // Not a protected route → let it through
+  if (!matchedRoute) return NextResponse.next();
+
+  // Try the token from Authorization header OR a cookie named "token"
+  const authHeader = req.headers.get("authorization") ?? "";
+  console.log(`Authorization header: ${authHeader}`);
+  const token =
+    authHeader.startsWith("Bearer ")
+      ? authHeader.slice(7)
+      : req.cookies.get("token")?.value ?? null;
+console.log(`Token: ${token}`)
+  // No token → redirect to login, preserving the intended URL
+  if (!token) {
+    const loginUrl = new URL("/login", req.url);
+    loginUrl.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(loginUrl);
   }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
+      email: string;
+      role: string;
+    };
 
-  if (token && routeRoles) {
-    const role = (token as any).role;
-    if (!roleBasedRoutes[routeRoles].includes(role)) {
-      // User role not allowed → redirect to dashboard or fallback
+    const allowedRoles = roleBasedRoutes[matchedRoute];
+
+    if (!allowedRoles.includes(decoded.role)) {
+      // Authenticated but wrong role → send to their own dashboard
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
-  }
 
-  return NextResponse.next();
+    // All good — forward the request
+    return NextResponse.next();
+  } catch {
+    // Token expired or tampered → back to login
+    const loginUrl = new URL("/login", req.url);
+    loginUrl.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
 }
 
+// Tell Next.js which paths to run the middleware on
 export const config = {
-  matcher: [
-    "/dashboard/:path*",
-    "/admin/:path*",
-    "/teacher/:path*",
-    "/student/:path*",
-  ],
+  matcher: ["/dashboard/:path*", "/admin/:path*", "/teacher/:path*", "/student/:path*"],
 };

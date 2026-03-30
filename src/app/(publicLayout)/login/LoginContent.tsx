@@ -20,33 +20,25 @@ const LoginContent = () => {
   const { mutate, isPending } = useMutation({
     mutationFn: loginUser,
 
-    onSuccess: (data) => {
-      if (!data?.token || !data?.user) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Login Failed',
-          text: 'Token or user data not received!',
-        });
-        return;
-      }
+ onSuccess: (data) => {
+  if (!data?.token || !data?.user) return;
 
-      login(data.token, data.user);
+  // ✅ Save token in cookie (for middleware)
+  document.cookie = `token=${data.token}; path=/`;
 
-      // Success Alert
-      Swal.fire({
-        icon: 'success',
-        title: 'Login Successful 🎉',
-        text: `Welcome back, ${data.user.name}!`,
-        timer: 1500,
-        showConfirmButton: false,
-      });
+  login(data.token, data.user);
 
-      // Redirect after delay
-      setTimeout(() => {
-        router.push(callbackUrl);
-      }, 1500);
+  Swal.fire({
+    icon: 'success',
+    title: 'Login Successful 🎉',
+    text: `Welcome back, ${data.user.name}!`,
+    timer: 1200,
+    showConfirmButton: false,
+  });
 
-    },
+  // ✅ No delay needed
+  router.push(callbackUrl);
+},
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {

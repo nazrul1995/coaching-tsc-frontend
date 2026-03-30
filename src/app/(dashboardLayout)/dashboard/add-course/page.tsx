@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import Image from "next/image";
 
 interface AddCourseFormValues {
   title: string;
@@ -131,7 +132,8 @@ const AddCoursePage = () => {
         {/* Preview thumbnail */}
         <div>
           {watch("thumbnail") && (
-            <img src={watch("thumbnail")} alt="Thumbnail preview" className="w-full h-40 object-cover rounded mt-2" />
+            <Image width={200}
+             height={200} src={watch("thumbnail")} alt="Thumbnail preview" className="w-full h-40 object-cover rounded mt-2" />
           )}
         </div>
 
