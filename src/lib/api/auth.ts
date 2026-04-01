@@ -4,7 +4,7 @@ export type RegisterPayload = {
   name: string;
   email: string;
   password: string;
-  role: 'student' | 'teacher' | 'guardian';
+  role: string;
   image?: string;
 };
 

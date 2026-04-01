@@ -81,7 +81,7 @@ const RegisterPage = () => {
         name: formData.name,
         email: formData.email,
         password: formData.password,
-        role: formData.role as 'student' | 'teacher' | 'guardian',
+        role: "user",
         image: imageUrl,
       };
 
@@ -89,7 +89,7 @@ const RegisterPage = () => {
     } catch (error) {
       Swal.fire({
         icon: 'error',
-        title: 'Image Upload Failed',
+        title: error instanceof Error ? error.message : 'Image upload failed',
         text: 'Try again',
       });
     }
@@ -160,7 +160,7 @@ const RegisterPage = () => {
             )}
           </div>
 
-          {/* Role */}
+          {/* Role
           <div>
             <label className="text-sm text-white/70">Role</label>
             <select
@@ -175,7 +175,7 @@ const RegisterPage = () => {
             {errors.role && (
               <p className="text-red-400 text-sm mt-1">{errors.role.message}</p>
             )}
-          </div>
+          </div> */}
 
           {/* Image URL */}
           <div>

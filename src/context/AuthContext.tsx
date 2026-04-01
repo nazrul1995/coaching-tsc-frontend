@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 
 export type User = {
   email: string;
-  role: 'student' | 'teacher' | 'guardian' | 'admin';
+  role: 'student' | 'teacher' | 'guardian' | 'admin'| 'user';
   id?: string;
   name?: string;
   image?: string;

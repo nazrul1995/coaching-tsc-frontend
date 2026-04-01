@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 const MyCoursesPage = () => {
   const [courses, setCourses] = useState<TCourse[]>([]);
@@ -121,7 +122,7 @@ const MyCoursesPage = () => {
       <div className="lg:hidden grid grid-cols-1 gap-4">
         {courses.map(course => (
           <div key={course._id} className="bg-gray-800 p-4 rounded-lg text-white shadow-md">
-            <img src={course.thumbnail} alt={course.title} className="w-full h-40 object-cover rounded-md mb-2" />
+            <Image width={100} height={100} src={course.thumbnail} alt={course.title} className="w-full h-40 object-cover rounded-md mb-2" />
             <h3 className="text-lg font-bold">{course.title}</h3>
             <p className="text-sm mb-1">${course.price} • {course.duration}</p>
             <p className="text-sm mb-2">Enrolled: {course.enrolledStudents}</p>

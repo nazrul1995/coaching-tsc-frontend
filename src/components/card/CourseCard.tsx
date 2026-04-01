@@ -1,9 +1,7 @@
 'use client';
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { TCourse } from '@/types/course';
-import Link from 'next/link';
 import EnrollButton from '../button/EnrollButton';
 
 interface CourseCardProps {

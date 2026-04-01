@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 import jwt from "jsonwebtoken";
 
 const roleBasedRoutes: Record<string, string[]> = {
-  "/dashboard": ["admin", "teacher", "student"],
+  "/dashboard": ["admin", "teacher", "student","user"],
   "/admin":     ["admin"],
   "/teacher":   ["teacher"],
   "/student":   ["student"],

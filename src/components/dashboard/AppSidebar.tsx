@@ -14,14 +14,14 @@ export function AppSidebar() {
   const handleLogout = () => logout();
 console.log("Rendering AppSidebar with user:", user); // Debugging log
   const menuItems = [
-    { label: "Overview", href: "/dashboard", key: "overview", roles: ["admin", "teacher", "student"], icon: <LayoutDashboard size={20} /> },
+    { label: "Overview", href: "/dashboard", key: "overview", roles: ["admin", "teacher", "student", "user"], icon: <LayoutDashboard size={20} /> },
     { label: "My Courses", href: "/dashboard/course-management", key: "courses", roles: ["teacher", "admin"], icon: <FileText size={20} /> },
-    { label: "My Enrolled Courses", href: "/dashboard/enrolled-courses", key: "enrolled-courses", roles: ["student"], icon: <FileText size={20} /> },
+    { label: "My Enrolled Courses", href: "/dashboard/enrolled-courses", key: "enrolled-courses", roles: ["student", "user"], icon: <FileText size={20} /> },
     { label: "Add Course", href: "/dashboard/add-course", key: "add-course", roles: ["teacher", "admin"], icon: <FileText size={20} /> },
     { label: "Schedule", href: "/dashboard/schedule", key: "schedule", roles: ["teacher", "student"], icon: <Calendar size={20} /> },
-    { label: "Profile", href: "/dashboard/profile", key: "profile", roles: ["admin", "teacher", "student"], icon: <User size={20} /> },
+    { label: "Profile", href: "/dashboard/profile", key: "profile", roles: ["admin", "teacher", "student", "user"], icon: <User size={20} /> },
     { label: "Admin Panel", href: "/admin", key: "admin", roles: ["admin"], icon: <User size={20} /> },
-    { label: "Teacher Panel", href: "/teacher", key: "teacher", roles: ["teacher"], icon: <FileText size={20} /> },
+    { label: "Student Result", href: "/dashboard/student-results", key: "student-results", roles: ["teacher"], icon: <FileText size={20} /> },
     { label: "Student Panel", href: "/student", key: "student", roles: ["student"], icon: <FileText size={20} /> },
   ];
 
