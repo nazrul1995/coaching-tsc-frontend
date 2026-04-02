@@ -81,16 +81,16 @@ const RegisterPage = () => {
         name: formData.name,
         email: formData.email,
         password: formData.password,
-        role: "user",
         image: imageUrl,
+        role: 'user',
       };
 
       mutate(payload);
     } catch (error) {
       Swal.fire({
         icon: 'error',
-        title: error instanceof Error ? error.message : 'Image upload failed',
-        text: 'Try again',
+        title: 'Image Upload Failed',
+        text: error instanceof Error ? error.message : 'Please try again',
       });
     }
   };
@@ -160,23 +160,6 @@ const RegisterPage = () => {
             )}
           </div>
 
-          {/* Role
-          <div>
-            <label className="text-sm text-white/70">Role</label>
-            <select
-              {...register('role', { required: 'Role is required' })}
-              className="w-full mt-2 p-4 rounded-xl bg-white/10 border border-white/20 focus:outline-none"
-            >
-              <option value="" className='text-white bg-gray-500'>Select Role</option>
-              <option value="student" className='text-white bg-gray-500'>Student</option>
-              <option value="teacher" className='text-white bg-gray-500'>Teacher</option>
-              <option value="guardian" className='text-white bg-gray-500'>Guardian</option>
-            </select>
-            {errors.role && (
-              <p className="text-red-400 text-sm mt-1">{errors.role.message}</p>
-            )}
-          </div> */}
-
           {/* Image URL */}
           <div>
             <label className="text-sm text-white/70">Profile Image URL</label>
@@ -207,10 +190,10 @@ const RegisterPage = () => {
             {isPending ? 'Submitting...' : 'Submit'}
           </Button>
         </form>
-<div className="my-4 text-center">or</div>
+        <div className="my-4 text-center">or</div>
 
-      {/* Google Login */}
-      <GoogleLoginButton />
+        {/* Google Login */}
+        <GoogleLoginButton />
         {/* Login link */}
         <p className="text-center text-sm text-white/70 mt-6">
           Already have an account?{' '}

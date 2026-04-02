@@ -31,7 +31,6 @@ const ApplyPage = () => {
     console.log("ROLE:", roleType);
     console.log("FORM DATA:", formData);
 
-    alert("Check console 🔍");
   };
 
   return (

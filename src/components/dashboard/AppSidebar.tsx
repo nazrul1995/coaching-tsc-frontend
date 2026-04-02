@@ -8,11 +8,9 @@ import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Button } from "../ui/button";
 
 export function AppSidebar() {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const [active, setActive] = useState("overview");
-
   const handleLogout = () => logout();
-console.log("Rendering AppSidebar with user:", user); // Debugging log
   const menuItems = [
     { label: "Overview", href: "/dashboard", key: "overview", roles: ["admin", "teacher", "student", "user"], icon: <LayoutDashboard size={20} /> },
     { label: "My Courses", href: "/dashboard/course-management", key: "courses", roles: ["teacher", "admin"], icon: <FileText size={20} /> },
@@ -25,6 +23,22 @@ console.log("Rendering AppSidebar with user:", user); // Debugging log
     { label: "Student Panel", href: "/student", key: "student", roles: ["student"], icon: <FileText size={20} /> },
   ];
 
+  if(isLoading) {
+    return (
+      <div className="text-white text-center mt-20">
+        Loading...
+      </div>
+    );
+  }
+
+   if (!user) {
+    return (
+      <div className="text-red-400 text-center mt-20">
+        User not found
+      </div>
+    );
+  }
+console.log("User data in AppSidebar:", user);
   return (
     <>
       {/* Desktop Sidebar */}
