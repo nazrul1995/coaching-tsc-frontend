@@ -1,134 +1,184 @@
 'use client';
-import React, { useState } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { LayoutDashboard, User, Calendar, FileText, LogOut, Menu } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
-import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
-import { Button } from "../ui/button";
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+import { LayoutDashboard, User, Calendar, FileText, LogOut, Menu, BookOpen, Plus, Trophy, Users } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
 
 export function AppSidebar() {
   const { user, logout, isLoading } = useAuth();
+  const pathname = usePathname();
   const [active, setActive] = useState("overview");
+
+  // Auto-detect active link from URL (improved UX)
+  useEffect(() => {
+    const currentPath = pathname.split('/').pop() || 'overview';
+    setActive(currentPath);
+  }, [pathname]);
+
   const handleLogout = () => logout();
+
   const menuItems = [
     { label: "Overview", href: "/dashboard", key: "overview", roles: ["admin", "teacher", "student", "user"], icon: <LayoutDashboard size={20} /> },
-    { label: "My Courses", href: "/dashboard/course-management", key: "courses", roles: ["teacher", "admin"], icon: <FileText size={20} /> },
-    { label: "My Enrolled Courses", href: "/dashboard/enrolled-courses", key: "enrolled-courses", roles: ["student", "user"], icon: <FileText size={20} /> },
-    { label: "Add Course", href: "/dashboard/add-course", key: "add-course", roles: ["teacher", "admin"], icon: <FileText size={20} /> },
+    { label: "My Courses", href: "/dashboard/course-management", key: "course-management", roles: ["teacher", "admin"], icon: <BookOpen size={20} /> },
+    { label: "My Enrolled Courses", href: "/dashboard/enrolled-courses", key: "enrolled-courses", roles: ["student", "user"], icon: <BookOpen size={20} /> },
+    { label: "Add Course", href: "/dashboard/add-course", key: "add-course", roles: ["teacher", "admin"], icon: <Plus size={20} /> },
     { label: "Schedule", href: "/dashboard/schedule", key: "schedule", roles: ["teacher", "student"], icon: <Calendar size={20} /> },
+    { label: "Student Results", href: "/dashboard/student-results", key: "student-results", roles: ["teacher"], icon: <Trophy size={20} /> },
     { label: "Profile", href: "/dashboard/profile", key: "profile", roles: ["admin", "teacher", "student", "user"], icon: <User size={20} /> },
-    { label: "Admin Panel", href: "/admin", key: "admin", roles: ["admin"], icon: <User size={20} /> },
-    { label: "Student Result", href: "/dashboard/student-results", key: "student-results", roles: ["teacher"], icon: <FileText size={20} /> },
-    { label: "Student Panel", href: "/student", key: "student", roles: ["student"], icon: <FileText size={20} /> },
+    { label: "Admin Panel", href: "/admin", key: "admin", roles: ["admin"], icon: <Users size={20} /> },
+    { label: "Student Panel", href: "/student", key: "student", roles: ["student"], icon: <Users size={20} /> },
   ];
 
-  if(isLoading) {
+  if (isLoading) {
     return (
-      <div className="text-white text-center mt-20">
-        Loading...
+      <div className="w-64 bg-white/5 flex items-center justify-center h-screen text-white/50">
+        Loading sidebar...
       </div>
     );
   }
 
-   if (!user) {
+  if (!user) {
     return (
-      <div className="text-red-400 text-center mt-20">
+      <div className="w-64 bg-white/5 flex items-center justify-center h-screen text-red-400">
         User not found
       </div>
     );
   }
-console.log("User data in AppSidebar:", user);
+
+  const filteredMenu = menuItems.filter(item => item.roles.includes(user?.role || ""));
+
   return (
     <>
-      {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-64 bg-white/5 border-r border-white/10 flex-col">
-        <div className="px-6 py-8 flex flex-col items-center">
-          <h1 className="text-2xl font-bold text-[#adc6ff] mb-4">Lens</h1>
-          {user?.image ? (
-            <div className="relative w-20 h-20 rounded-full overflow-hidden mb-2">
-              <Image src={user.image} alt="Profile" fill style={{ objectFit: "cover" }} />
-            </div>
-          ) : (
-            <div className="w-20 h-20 rounded-full bg-[#adc6ff]/20 flex items-center justify-center text-xl mb-2">
-              {user?.name?.charAt(0).toUpperCase() || "U"}
-            </div>
-          )}
-          <p className="text-white/70 text-sm">{user?.name || "User"}</p>
-          <p className="text-[#6ffbbe] text-xs capitalize">{user?.role}</p>
+      {/* === DESKTOP SIDEBAR - Premium Glass Design === */}
+      <aside className="hidden md:flex w-72 bg-white/5 backdrop-blur-2xl border-r border-white/10 flex-col h-screen fixed left-0 top-0 z-50 shadow-2xl">
+        
+        {/* Logo + Header */}
+        <div className="px-6 pt-8 pb-6 border-b border-white/10 flex items-center gap-3">
+          <div className="w-9 h-9 bg-gradient-to-br from-[#adc6ff] to-[#6ffbbe] rounded-2xl flex items-center justify-center text-[#0b1326] font-bold text-2xl shadow-inner">
+            L
+          </div>
+          <h1 className="text-3xl font-bold tracking-tighter text-white">Lens</h1>
         </div>
 
-        <nav className="flex-1 px-4 mt-6 space-y-2">
-          {menuItems
-            .filter(item => item.roles.includes(user?.role || ""))
-            .map(item => (
-              <Link
-                key={item.key}
-                href={item.href}
-                className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
-                  active === item.key ? "bg-[#adc6ff]/20 text-[#adc6ff]" : "hover:bg-white/10"
-                }`}
-                onClick={() => setActive(item.key)}
-              >
-                {item.icon} {item.label}
-              </Link>
-            ))}
+        {/* Profile Card - Improved */}
+        <div className="px-6 py-6 border-b border-white/10">
+          <Link 
+            href="/dashboard/profile"
+            className="flex items-center gap-4 group hover:bg-white/10 transition-all rounded-3xl p-3 -mx-3"
+          >
+            {user?.image ? (
+              <div className="relative w-12 h-12 rounded-2xl overflow-hidden ring-2 ring-[#adc6ff]/30 group-hover:ring-[#adc6ff]/60 transition-all">
+                <Image src={user.image} alt="Profile" fill className="object-cover" />
+              </div>
+            ) : (
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#adc6ff]/20 to-[#6ffbbe]/20 flex items-center justify-center text-3xl font-semibold text-white/80 ring-2 ring-white/10">
+                {user?.name?.charAt(0).toUpperCase() || "U"}
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <p className="text-white font-semibold truncate">{user?.name || "User"}</p>
+              <p className="text-[#6ffbbe] text-sm capitalize font-medium flex items-center gap-1.5">
+                <span className="w-2 h-2 bg-[#6ffbbe] rounded-full animate-pulse"></span>
+                {user?.role}
+              </p>
+            </div>
+          </Link>
+        </div>
+
+        {/* Navigation - Modern & Clean */}
+        <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto">
+          {filteredMenu.map(item => (
+            <Link
+              key={item.key}
+              href={item.href}
+              onClick={() => setActive(item.key)}
+              className={`flex items-center gap-3 px-5 py-4 rounded-3xl transition-all text-sm font-medium group ${
+                active === item.key
+                  ? "bg-gradient-to-r from-[#adc6ff]/10 to-[#6ffbbe]/10 text-[#adc6ff] shadow-inner border border-[#adc6ff]/20"
+                  : "hover:bg-white/10 text-white/80 hover:text-white"
+              }`}
+            >
+              <span className={active === item.key ? "text-[#adc6ff]" : "text-white/70 group-hover:text-white"}>
+                {item.icon}
+              </span>
+              {item.label}
+            </Link>
+          ))}
         </nav>
 
-        <div className="px-4 py-4 border-t border-white/10">
+        {/* Logout - Premium Button */}
+        <div className="px-6 pb-8">
           <Button
             variant="default"
-            className="w-full flex items-center gap-3 justify-center bg-red-500 hover:bg-red-600"
             onClick={handleLogout}
+            className="w-full h-12 rounded-3xl bg-white/10 hover:bg-red-500/90 hover:text-white transition-all flex items-center justify-center gap-3 text-sm font-semibold"
           >
-            <LogOut size={18} /> Logout
+            <LogOut size={18} />
+            Logout
           </Button>
         </div>
       </aside>
 
-      {/* Mobile Sidebar */}
+      {/* === MOBILE SIDEBAR (Sheet) - Same Premium Look === */}
       <Sheet>
-        <SheetTrigger className="md:hidden p-2 hover:bg-white/10 rounded-lg">
+        <SheetTrigger className="md:hidden fixed top-4 left-4 z-50 p-3 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-2xl text-white">
           <Menu size={24} />
         </SheetTrigger>
 
-        <SheetContent side="left" className="w-64 bg-[#0b1326] text-white">
-          <div className="px-6 py-8 flex flex-col items-center">
-            <h1 className="text-2xl font-bold text-[#adc6ff] mb-4">Lens</h1>
-            {user?.image ? (
-              <div className="relative w-20 h-20 rounded-full overflow-hidden mb-2">
-                <Image src={user.image} alt="Profile" fill style={{ objectFit: "cover" }} />
-              </div>
-            ) : (
-              <div className="w-20 h-20 rounded-full bg-[#adc6ff]/20 flex items-center justify-center text-xl mb-2">
-                {user?.name?.charAt(0).toUpperCase() || "U"}
-              </div>
-            )}
-            <p className="text-white/70 text-sm">{user?.name || "User"}</p>
-            <p className="text-[#6ffbbe] text-xs capitalize">{user?.role}</p>
+        <SheetContent side="left" className="w-72 bg-white/5 backdrop-blur-2xl border-r border-white/10 p-0 text-white">
+          {/* Same content as desktop for consistency */}
+          <div className="px-6 pt-8 pb-6 border-b border-white/10 flex items-center gap-3">
+            <div className="w-9 h-9 bg-gradient-to-br from-[#adc6ff] to-[#6ffbbe] rounded-2xl flex items-center justify-center text-[#0b1326] font-bold text-2xl shadow-inner">
+              L
+            </div>
+            <h1 className="text-3xl font-bold tracking-tighter text-white">Lens</h1>
           </div>
 
-          <nav className="flex-1 px-4 mt-6 space-y-2">
-            {menuItems
-              .filter(item => item.roles.includes(user?.role || ""))
-              .map(item => (
-                <Link
-                  key={item.key}
-                  href={item.href}
-                  className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10"
-                >
-                  {item.icon} {item.label}
-                </Link>
-              ))}
+          <div className="px-6 py-6 border-b border-white/10">
+            <Link href="/dashboard/profile" className="flex items-center gap-4 group hover:bg-white/10 transition-all rounded-3xl p-3 -mx-3">
+              {user?.image ? (
+                <div className="relative w-12 h-12 rounded-2xl overflow-hidden ring-2 ring-[#adc6ff]/30">
+                  <Image src={user.image} alt="Profile" fill className="object-cover" />
+                </div>
+              ) : (
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#adc6ff]/20 to-[#6ffbbe]/20 flex items-center justify-center text-3xl font-semibold text-white/80">
+                  {user?.name?.charAt(0).toUpperCase() || "U"}
+                </div>
+              )}
+              <div className="flex-1">
+                <p className="text-white font-semibold">{user?.name || "User"}</p>
+                <p className="text-[#6ffbbe] text-sm capitalize font-medium">{user?.role}</p>
+              </div>
+            </Link>
+          </div>
+
+          <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto">
+            {filteredMenu.map(item => (
+              <Link
+                key={item.key}
+                href={item.href}
+                className={`flex items-center gap-3 px-5 py-4 rounded-3xl transition-all text-sm font-medium ${
+                  pathname === item.href ? "bg-gradient-to-r from-[#adc6ff]/10 to-[#6ffbbe]/10 text-[#adc6ff]" : "hover:bg-white/10 text-white/80"
+                }`}
+              >
+                {item.icon}
+                {item.label}
+              </Link>
+            ))}
           </nav>
 
-          <div className="px-4 py-4 border-t border-white/10">
+          <div className="px-6 pb-8">
             <Button
               variant="default"
-              className="w-full flex items-center gap-3 justify-center bg-red-500 hover:bg-red-600"
               onClick={handleLogout}
+              className="w-full h-12 rounded-3xl bg-white/10 hover:bg-red-500/90 hover:text-white transition-all flex items-center justify-center gap-3 text-sm font-semibold"
             >
-              <LogOut size={18} /> Logout
+              <LogOut size={18} />
+              Logout
             </Button>
           </div>
         </SheetContent>

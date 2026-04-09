@@ -1,12 +1,8 @@
 'use client';
-
-import React from "react";
-
 export default function DashboardHome() {
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-6 text-[#adc6ff]">Dashboard</h1>
-
+      <h1 className="text-3xl font-bold mb-6 text-[#adc6ff]">Dashboard HoME</h1>
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white/5 p-6 rounded-2xl border border-white/10 shadow-lg flex flex-col">

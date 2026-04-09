@@ -94,11 +94,11 @@ const MyCoursesPage = () => {
           <tbody>
             {courses.map(course => (
               <tr key={course._id} className="border-b border-gray-600">
-                <td className="py-2 px-4">{course.title}</td>
-                <td className="py-2 px-4">${course.price}</td>
-                <td className="py-2 px-4">{course.duration}</td>
-                <td className="py-2 px-4">{course.enrolledStudents}</td>
-                <td className="py-2 px-4 space-x-2">
+                <td className="py-2 px-4 text-center">{course.title}</td>
+                <td className="py-2 px-4 text-center">${course.price}</td>
+                <td className="py-2 px-4 text-center">{course.duration}</td>
+                <td className="py-2 px-4 text-center">{course.enrolledStudents}</td>
+                <td className="py-2 px-4 text-center space-x-2">
                   <button 
                     onClick={() => openUpdateModal(course)} 
                     className="bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded"

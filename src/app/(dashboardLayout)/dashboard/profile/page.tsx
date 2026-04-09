@@ -6,18 +6,6 @@ import { useAuth } from "@/context/AuthContext";
 
 const ProfilePage = () => {
   const { user, isLoading } = useAuth();
-
-  // 🔥 Replace with API later
-  const studentData = {
-    name: "Abid Islam",
-    email: "abid@gmail.com",
-    phone: "01540170227",
-    className: "10",
-    batch: "SSC-2026",
-    group: "science",
-    photo: "https://i.ibb.co/qLGHjp13/IMG-20210828-171044.jpg",
-  };
-
   if (isLoading) {
     return (
       <div className="text-white text-center mt-20">
@@ -37,11 +25,11 @@ const ProfilePage = () => {
   return (
     <div className="min-h-screen bg-[#0b1326] text-white p-6">
 
-      {user?.role === "user" && <UserProfile user={user} />}
+      {user?.role === "user" && <UserProfile />}
 
-      {user?.role === "student" && <StudentProfile data={studentData} />}
+      {user?.role === "student" && <StudentProfile />}
 
-      {user?.role === "teacher" && <TeacherProfile data={studentData} />}
+      {user?.role === "teacher" && <TeacherProfile />}
 
     </div>
   );
