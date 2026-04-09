@@ -1,11 +1,12 @@
 'use client';
 import { StudentProfile } from "@/components/dashboard/profile/StudentProfile";
-import { TeacherProfile } from "@/components/dashboard/profile/TeacherProfile";
+import TeacherProfile from "@/components/dashboard/profile/TeacherProfile";
 import { UserProfile } from "@/components/dashboard/profile/UserProfile";
 import { useAuth } from "@/context/AuthContext";
 
 const ProfilePage = () => {
   const { user, isLoading } = useAuth();
+  console.log(user)
   if (isLoading) {
     return (
       <div className="text-white text-center mt-20">

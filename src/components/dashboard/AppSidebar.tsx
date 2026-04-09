@@ -1,9 +1,9 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, User, Calendar, FileText, LogOut, Menu, BookOpen, Plus, Trophy, Users } from 'lucide-react';
+import { LayoutDashboard, User, Calendar, LogOut, Menu, BookOpen, Plus, Trophy, Users } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -12,13 +12,7 @@ export function AppSidebar() {
   const { user, logout, isLoading } = useAuth();
   const pathname = usePathname();
   const [active, setActive] = useState("overview");
-
-  // Auto-detect active link from URL (improved UX)
-  useEffect(() => {
-    const currentPath = pathname.split('/').pop() || 'overview';
-    setActive(currentPath);
-  }, [pathname]);
-
+  
   const handleLogout = () => logout();
 
   const menuItems = [
@@ -98,7 +92,7 @@ export function AppSidebar() {
               onClick={() => setActive(item.key)}
               className={`flex items-center gap-3 px-5 py-4 rounded-3xl transition-all text-sm font-medium group ${
                 active === item.key
-                  ? "bg-gradient-to-r from-[#adc6ff]/10 to-[#6ffbbe]/10 text-[#adc6ff] shadow-inner border border-[#adc6ff]/20"
+                  ? "bg-linear-to-r from-[#adc6ff]/10 to-[#6ffbbe]/10 text-[#adc6ff] shadow-inner border border-[#adc6ff]/20"
                   : "hover:bg-white/10 text-white/80 hover:text-white"
               }`}
             >
@@ -132,7 +126,7 @@ export function AppSidebar() {
         <SheetContent side="left" className="w-72 bg-white/5 backdrop-blur-2xl border-r border-white/10 p-0 text-white">
           {/* Same content as desktop for consistency */}
           <div className="px-6 pt-8 pb-6 border-b border-white/10 flex items-center gap-3">
-            <div className="w-9 h-9 bg-gradient-to-br from-[#adc6ff] to-[#6ffbbe] rounded-2xl flex items-center justify-center text-[#0b1326] font-bold text-2xl shadow-inner">
+            <div className="w-9 h-9 bg-linear-to-br from-[#adc6ff] to-[#6ffbbe] rounded-2xl flex items-center justify-center text-[#0b1326] font-bold text-2xl shadow-inner">
               L
             </div>
             <h1 className="text-3xl font-bold tracking-tighter text-white">Lens</h1>

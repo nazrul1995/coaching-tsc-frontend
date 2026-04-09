@@ -1,9 +1,8 @@
 'use client';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 
-// Lucide React Icons
 import {
   User,
   Briefcase,
@@ -15,7 +14,12 @@ import {
   Facebook,
   Linkedin,
 } from 'lucide-react';
+
 import { useForm } from 'react-hook-form';
+import { useMutation } from '@tanstack/react-query';
+import { useAuth } from '@/context/AuthContext';
+import axiosSecure from '@/lib/axiosSecure';
+import { uploadImageToImgBB } from '@/lib/imgUpload';
 
 type TeacherFormValues = {
   name: string;
@@ -35,73 +39,137 @@ type TeacherFormValues = {
 };
 
 const TeacherApplicationForm = () => {
+  const { user, isLoading } = useAuth();
+  const [preview, setPreview] = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
-    watch,
     reset,
+    watch,
     formState: { errors },
   } = useForm<TeacherFormValues>({
     defaultValues: {
+      name: user?.name || '',
+      email: user?.email || '',
       teachingLevel: ['HSC (Higher Secondary)'],
       availableDays: ['Wed', 'Thu', 'Fri'],
     },
   });
 
-  // Watch all values for live debugging
-  const formData = watch();
+  // Watch photo for live preview
+  const photoWatch = watch('photo');
 
-  const onSubmit = (data: TeacherFormValues) => {
-    // ✅ CONSOLE INPUT DATA (beautiful formatted log)
-    console.log('%c✅ FORM SUBMITTED - FULL INPUT DATA', 'color:#adc6ff; font-size:14px; font-weight:bold');
-    console.dir(data, { depth: null }); // Full object in console
-    console.table({
-      name: data.name,
-      email: data.email,
-      phone: data.phone,
-      bio: data.bio?.substring(0, 50) + '...',
-      qualification: data.qualification,
-      experience: data.experience,
-      subjects: data.subjects,
-      teachingLevel: data.teachingLevel || [],
-      availableDays: data.availableDays || [],
-      linkedin: data.linkedin,
-      website: data.website,
-      twitter: data.twitter,
-      facebook: data.facebook,
-      photo: data.photo ? '✅ File Selected' : 'No photo',
-    });
+  // Generate image preview when file is selected
+  useEffect(() => {
+    if (photoWatch && photoWatch.length > 0) {
+      const file = photoWatch[0];
+      const objectUrl = URL.createObjectURL(file);
+      setPreview(objectUrl);
 
-    Swal.fire({
-      title: 'Application Submitted!',
-      text: 'Your teacher application has been submitted successfully. We will review your information and get back to you within 3-5 business days.',
-      icon: 'success',
-      confirmButtonText: 'Back to Dashboard',
-      confirmButtonColor: '#adc6ff',
-      background: '#0b1326',
-      color: '#fff',
-      customClass: { popup: 'rounded-3xl border border-white/10' },
-    });
+      // Cleanup
+      return () => URL.revokeObjectURL(objectUrl);
+    }
+  }, [photoWatch]);
 
-    reset(); // Clear form after submit
+  // TanStack Mutation
+  const mutation = useMutation({
+    mutationFn: async (payload: {
+      name: string;
+      email: string;
+      phone: string;
+      photoUrl: string;
+      bio: string;
+      qualification: string;
+      experience: string;
+      subjects: string[];
+      teachingLevel: string[];
+      linkedin?: string;
+      facebook?: string;
+      twitter?: string;
+      website?: string;
+    }) => {
+      const response = await axiosSecure.post('/teachers', payload);
+      return response.data;
+    },
+    onSuccess: () => {
+      Swal.fire({
+        title: '✅ Application Submitted!',
+        text: 'We will review your profile and get back to you within 3-5 business days.',
+        icon: 'success',
+        confirmButtonColor: '#adc6ff',
+        background: '#0b1326',
+        color: '#fff',
+        customClass: { popup: 'rounded-3xl border border-white/10' },
+      });
+      reset();
+      setPreview(null);
+    },
+    onError: (error: any) => {
+      console.error('Submission error:', error);
+      Swal.fire({
+        title: '❌ Submission Failed',
+        text: error?.response?.data?.message || 'Something went wrong. Please try again.',
+        icon: 'error',
+        confirmButtonColor: '#adc6ff',
+        background: '#0b1326',
+        color: '#fff',
+      });
+    },
+  });
+
+  // Submit Handler with proper photo handling + console log
+  const onSubmit = async (data: TeacherFormValues) => {
+    console.dir(data, { depth: null });
+
+    try {
+      let photoUrl = '';
+
+      if (data.photo && data.photo.length > 0) {
+        const file = data.photo[0];
+        photoUrl = await uploadImageToImgBB(file);
+      }
+
+      const payload = {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        photoUrl,
+        bio: data.bio,
+        qualification: data.qualification,
+        experience: data.experience,
+        subjects: data.subjects.split(',').map(s => s.trim()),
+        teachingLevel: data.teachingLevel || [],
+        availableDays: data.availableDays,
+        linkedin: data.linkedin,
+        facebook: data.facebook,
+        twitter: data.twitter,
+        website: data.website,
+      };
+
+      mutation.mutate(payload);
+    } catch (error) {
+      console.error('Image upload error:', error);
+      Swal.fire('Error', 'Failed to upload profile photo', 'error');
+    }
   };
 
-  const handleSaveDraft = () => {
-    const currentData = watch();
-    console.log('%c💾 DRAFT SAVED - Current Form Data', 'color:#6ffbbe; font-size:14px; font-weight:bold');
-    console.dir(currentData, { depth: null });
-
-    Swal.fire({
-      title: 'Draft Saved',
-      text: 'Your progress has been saved locally (check console for full data)',
-      icon: 'info',
-      timer: 2200,
-      showConfirmButton: false,
-      background: '#0b1326',
-      color: '#fff',
-      customClass: { popup: 'rounded-3xl border border-white/10' },
-    });
-  };
+ 
+  useEffect(() => {
+    if (user) {
+      reset({
+        name: user.name,
+        email: user.email,
+      });
+    }
+  }, [user, reset]);
+  if (isLoading) {
+    return (
+      <div className="flex h-96 items-center justify-center text-white/70">
+        Loading your information...
+      </div>
+    );
+  }
 
   return (
     <form
@@ -125,12 +193,11 @@ const TeacherApplicationForm = () => {
             <div className="flex flex-col gap-2">
               <label className="text-sm font-semibold text-white/70">Full Legal Name</label>
               <input
-                {...register('name', { required: 'Name is required' })}
+                {...register('name')}
                 type="text"
-                placeholder="e.g. Jahid Hasan"
-                className="bg-[#16203a] border border-white/20 focus:border-[#adc6ff] rounded-2xl px-5 py-4 text-white placeholder:text-white/40 transition-all outline-none w-full"
+                readOnly
+                className="bg-[#16203a] border border-white/20 rounded-2xl px-5 py-4 text-white w-full"
               />
-              {errors.name && <p className="text-red-400 text-sm mt-1">{errors.name.message}</p>}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -139,7 +206,6 @@ const TeacherApplicationForm = () => {
                 <input
                   {...register('email', { required: 'Email is required' })}
                   type="email"
-                  placeholder="jahid.h@academic.edu"
                   className="bg-[#16203a] border border-white/20 focus:border-[#adc6ff] rounded-2xl px-5 py-4 text-white placeholder:text-white/40 transition-all outline-none w-full"
                 />
                 {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email.message}</p>}
@@ -157,18 +223,34 @@ const TeacherApplicationForm = () => {
             </div>
           </div>
 
-          {/* Photo Upload */}
+          {/* Photo Upload with Preview */}
           <div className="lg:col-span-5">
             <label className="text-sm font-semibold text-white/70 block mb-3">Professional Portrait</label>
             <label
               htmlFor="photo-upload"
-              className="border-2 border-dashed border-white/30 hover:border-[#adc6ff]/50 rounded-3xl flex flex-col items-center justify-center py-10 sm:py-12 px-6 bg-white/5 transition-all cursor-pointer group w-full"
+              className="border-2 border-dashed border-white/30 hover:border-[#adc6ff]/50 rounded-3xl flex flex-col items-center justify-center py-10 sm:py-12 px-6 bg-white/5 transition-all cursor-pointer group w-full relative overflow-hidden"
             >
-              <div className="w-20 h-20 rounded-2xl bg-white/10 flex items-center justify-center mb-6 group-active:scale-95 transition-transform">
-                <UploadCloud size={36} className="text-[#adc6ff]" />
-              </div>
-              <p className="text-white font-medium text-base mb-1 text-center">Drag &amp; drop your photo</p>
-              <p className="text-white/50 text-xs text-center">JPG, PNG • Max 5MB • Min 400×400px</p>
+              {preview ? (
+                <div className="relative w-28 h-28 rounded-2xl overflow-hidden mb-4">
+                  <img
+                    src={preview}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="w-20 h-20 rounded-2xl bg-white/10 flex items-center justify-center mb-6 group-active:scale-95 transition-transform">
+                  <UploadCloud size={36} className="text-[#adc6ff]" />
+                </div>
+              )}
+
+              <p className="text-white font-medium text-base mb-1 text-center">
+                {preview ? 'Change photo' : 'Drag & drop your photo'}
+              </p>
+              <p className="text-white/50 text-xs text-center">
+                JPG, PNG • Max 5MB • Min 400×400px
+              </p>
+
               <input
                 {...register('photo')}
                 id="photo-upload"
@@ -260,7 +342,6 @@ const TeacherApplicationForm = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          {/* Target Levels */}
           <div>
             <label className="text-sm font-semibold text-white/70 block mb-6">Target Levels</label>
             <div className="flex flex-wrap gap-3">
@@ -283,7 +364,6 @@ const TeacherApplicationForm = () => {
             </div>
           </div>
 
-          {/* Availability Days */}
           <div>
             <label className="text-sm font-semibold text-white/70 block mb-6">Availability Days</label>
             <div className="grid grid-cols-4 sm:grid-cols-7 gap-3">
@@ -361,27 +441,20 @@ const TeacherApplicationForm = () => {
         </div>
       </section>
 
-      {/* Sticky Action Bar */}
+      {/* Sticky Action Bar - Fixed */}
       <div className="sticky bottom-6 z-50 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/5 border border-white/10 backdrop-blur-xl rounded-3xl p-5 sm:p-6 shadow-2xl">
         <div className="hidden sm:flex items-center gap-3 text-sm">
           <div className="text-white/70 font-medium">Ready to join our faculty?</div>
-          <div className="text-white/40 text-xs">All data will be logged to console</div>
+          <div className="text-white/40 text-xs">All data is logged to console for debugging</div>
         </div>
 
         <div className="flex gap-3 w-full sm:w-auto">
           <button
-            type="button"
-            onClick={handleSaveDraft}
-            className="flex-1 sm:flex-none px-8 py-4 rounded-2xl font-semibold bg-white/10 hover:bg-white/20 transition-colors text-white text-sm"
-          >
-            Save Draft
-          </button>
-
-          <button
             type="submit"
-            className="flex-1 sm:flex-none px-10 py-4 rounded-2xl font-semibold bg-gradient-to-r from-[#adc6ff] to-[#6ffbbe] text-[#0b1326] hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[#adc6ff]/30 text-sm"
+            disabled={mutation.isPending}
+            className="flex-1 sm:flex-none px-10 py-4 rounded-2xl font-semibold bg-linear-to-r from-[#adc6ff] to-[#6ffbbe] text-[#0b1326] hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[#adc6ff]/30 text-sm disabled:opacity-70"
           >
-            Submit Application
+            {mutation.isPending ? 'Submitting...' : 'Submit Application'}
           </button>
         </div>
       </div>
