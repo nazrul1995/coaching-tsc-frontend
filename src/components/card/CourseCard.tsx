@@ -3,6 +3,7 @@ import React from 'react';
 import Image from 'next/image';
 import { TCourse } from '@/types/course';
 import EnrollButton from '../button/EnrollButton';
+import Link from 'next/link';
 
 interface CourseCardProps {
   course: TCourse;
@@ -24,7 +25,9 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
 
       {/* Course Title */}
       <h3 className="font-bold text-lg mb-2 line-clamp-2 text-white">
-        {course.title}
+      <Link href={`/courses/${course._id}`}>
+  {course.title}
+</Link>
       </h3>
 
       {/* Rating & Students */}

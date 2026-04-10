@@ -119,7 +119,7 @@ const TeacherProfile = () => {
         </div>
 
         {/* Edit Button */}
-        <Link href="/dashboard/teacher-application">
+        <Link href="/dashboard/profile-edit">
           <Button className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-8 py-6 rounded-3xl">
             <Edit size={20} />
             Edit Profile
@@ -286,11 +286,7 @@ const TeacherProfile = () => {
 
       {/* Footer note */}
       <div className="text-center text-white/40 text-xs">
-      <p>        Last updated: {new Date(teacher.updatedAt).toLocaleDateString()} 
-</p>
-<Link href={`/dashboard/teacher-application?id=${teacher._id}`}>
-  edit now
-</Link>
+      <p>Last updated: {new Date(teacher.updatedAt).toLocaleDateString()} </p>
       </div>
     </div>
   );

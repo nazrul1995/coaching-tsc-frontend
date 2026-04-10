@@ -1,10 +1,9 @@
 'use client';
-import StudentProfile from "@/components/dashboard/profile/StudentProfile";
-import TeacherProfile from "@/components/dashboard/profile/TeacherProfile";
-import { UserProfile } from "@/components/dashboard/profile/UserProfile";
+import StudentUpdate from "@/components/dashboard/profile/update/StudentUpdate";
+import TeacherUpdate from "@/components/dashboard/profile/update/TeacherUpdate";
 import { useAuth } from "@/context/AuthContext";
 
-const ProfilePage = () => {
+const ProfileUpdate = () => {
   const { user, isLoading } = useAuth();
   console.log(user)
   if (isLoading) {
@@ -25,15 +24,10 @@ const ProfilePage = () => {
   console.log("User data in ProfilePage:", user);
   return (
     <div className="min-h-screen bg-[#0b1326] text-white p-6">
-
-      {user?.role === "user" && <UserProfile />}
-
-      {user?.role === "student" && <StudentProfile />}
-
-      {user?.role === "teacher" && <TeacherProfile />}
-
+      {user?.role === "student" && <StudentUpdate />}
+      {user?.role === "teacher" && <TeacherUpdate/>}
     </div>
   );
 };
 
-export default ProfilePage;
+export default ProfileUpdate;
