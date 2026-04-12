@@ -61,9 +61,9 @@ const TeacherProfile = () => {
       <div className="bg-white/5 border border-white/10 rounded-3xl p-8 md:p-10 flex flex-col md:flex-row gap-8 items-center">
         {/* Photo */}
         <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-3xl overflow-hidden border-4 border-[#adc6ff]/30 flex-shrink-0">
-          {teacher.photoUrl ? (
+          {teacher.photoUrl || user?.image ? (
             <Image
-              src={teacher.photoUrl}
+              src={ teacher.photoUrl || user?.image}
               alt={teacher.name}
               fill
               className="object-cover"

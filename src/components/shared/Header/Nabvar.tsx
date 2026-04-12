@@ -135,7 +135,7 @@ const Navbar = () => {
                       <LayoutDashboard size={18} /> Dashboard
                     </Link>
                     <Link
-                      href="/profile"
+                      href="/dashboard/profile"
                       className="flex items-center gap-3 px-4 py-2 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-all"
                       onClick={() => setIsProfileOpen(false)}
                     >
