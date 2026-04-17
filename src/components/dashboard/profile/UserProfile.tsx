@@ -1,12 +1,9 @@
 "use client";
 
-import { useAuth, User } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 
 export const UserProfile = () => {
   const router = useRouter();
-  const { user } = useAuth();
-
   return (
     <div className="bg-white/5 p-8 rounded-3xl flex gap-6 items-center">
       {/* profile info */}

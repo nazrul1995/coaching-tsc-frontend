@@ -8,6 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter, usePathname } from 'next/navigation';
 import Swal from 'sweetalert2';
 import Image from 'next/image';
+import Logo from '../logo/Logo';
 
 const Navbar = () => {
   const { isLoggedIn, user, logout, isLoading } = useAuth();
@@ -83,11 +84,7 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0b1326]/90 backdrop-blur-md shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] border-b border-white/10">
       <div className="max-w-360 mx-auto px-6 md:px-8 h-20 flex items-center justify-between">
-        {/* Logo */}
-        <Link href="/" className="text-3xl font-black tracking-tighter text-[#adc6ff] font-headline">
-          Lens
-        </Link>
-
+      <Logo></Logo>
         {/* Desktop Links */}
         <div className="hidden md:flex items-center gap-6 font-medium text-sm">
           {navLinks.map((link) => renderLink(link))}

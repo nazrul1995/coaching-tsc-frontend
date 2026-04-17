@@ -7,12 +7,13 @@ import { LayoutDashboard, User, Calendar, LogOut, Menu, BookOpen, Plus, Trophy, 
 import { useAuth } from '@/context/AuthContext';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
+import Logo from '../shared/logo/Logo';
 
 export function AppSidebar() {
   const { user, logout, isLoading } = useAuth();
   const pathname = usePathname();
   const [active, setActive] = useState("overview");
-  
+
   const handleLogout = () => logout();
 
   const menuItems = [
@@ -49,18 +50,17 @@ export function AppSidebar() {
     <>
       {/* === DESKTOP SIDEBAR - Premium Glass Design === */}
       <aside className="hidden md:flex w-72 bg-white/5 backdrop-blur-2xl border-r border-white/10 flex-col h-screen fixed left-0 top-0 z-50 shadow-2xl">
-        
+
         {/* Logo + Header */}
-        <div className="px-6 pt-8 pb-6 border-b border-white/10 flex items-center gap-3">
-          <div className="w-9 h-9 bg-gradient-to-br from-[#adc6ff] to-[#6ffbbe] rounded-2xl flex items-center justify-center text-[#0b1326] font-bold text-2xl shadow-inner">
-            L
+        <div className="px-6 pt-5 pb-6 border-b border-white/10 flex items-center gap-3">
+          <div className="w-9 h-9 bg-gradient-to-br from-[#adc6ff] to-[#6ffbbe] rounded-2xl flex items-center justify-center text-[#0b1326] font-bold text-2xl shadow-inner">L
           </div>
-          <h1 className="text-3xl font-bold tracking-tighter text-white">Lens</h1>
+            <Logo />
         </div>
 
         {/* Profile Card - Improved */}
         <div className="px-6 py-6 border-b border-white/10">
-          <Link 
+          <Link
             href="/dashboard/profile"
             className="flex items-center gap-4 group hover:bg-white/10 transition-all rounded-3xl p-3 -mx-3"
           >
@@ -90,11 +90,10 @@ export function AppSidebar() {
               key={item.key}
               href={item.href}
               onClick={() => setActive(item.key)}
-              className={`flex items-center gap-3 px-5 py-4 rounded-3xl transition-all text-sm font-medium group ${
-                active === item.key
+              className={`flex items-center gap-3 px-5 py-4 rounded-3xl transition-all text-sm font-medium group ${active === item.key
                   ? "bg-linear-to-r from-[#adc6ff]/10 to-[#6ffbbe]/10 text-[#adc6ff] shadow-inner border border-[#adc6ff]/20"
                   : "hover:bg-white/10 text-white/80 hover:text-white"
-              }`}
+                }`}
             >
               <span className={active === item.key ? "text-[#adc6ff]" : "text-white/70 group-hover:text-white"}>
                 {item.icon}
@@ -155,9 +154,8 @@ export function AppSidebar() {
               <Link
                 key={item.key}
                 href={item.href}
-                className={`flex items-center gap-3 px-5 py-4 rounded-3xl transition-all text-sm font-medium ${
-                  pathname === item.href ? "bg-gradient-to-r from-[#adc6ff]/10 to-[#6ffbbe]/10 text-[#adc6ff]" : "hover:bg-white/10 text-white/80"
-                }`}
+                className={`flex items-center gap-3 px-5 py-4 rounded-3xl transition-all text-sm font-medium ${pathname === item.href ? "bg-gradient-to-r from-[#adc6ff]/10 to-[#6ffbbe]/10 text-[#adc6ff]" : "hover:bg-white/10 text-white/80"
+                  }`}
               >
                 {item.icon}
                 {item.label}

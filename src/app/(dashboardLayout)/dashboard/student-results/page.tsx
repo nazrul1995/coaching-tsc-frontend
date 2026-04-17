@@ -166,6 +166,7 @@ const StudentResultsPage = () => {
       setFormData({
         studentId: '',
         studentName: '',
+        studentPhoto: '',
         className: '',
         batch: '',
         group: '',
@@ -272,9 +273,13 @@ const StudentResultsPage = () => {
                 className="bg-gray-800 p-2 rounded"
               >
                 <option value="">Select Class</option>
+                <option value="12">Class 12</option>
+                <option value="11">Class 11</option>
                 <option value="10">Class 10</option>
                 <option value="9">Class 9</option>
                 <option value="8">Class 8</option>
+                <option value="7">Class 7</option>
+                <option value="6">Class 6</option>
               </select>
 
               <select
