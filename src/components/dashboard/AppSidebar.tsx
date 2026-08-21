@@ -49,11 +49,11 @@ export function AppSidebar() {
   return (
     <>
       {/* === DESKTOP SIDEBAR - Premium Glass Design === */}
-      <aside className="hidden md:flex w-72 bg-white/5 backdrop-blur-2xl border-r border-white/10 flex-col h-screen fixed left-0 top-0 z-50 shadow-2xl">
+      <aside className="hidden md:flex w-72 bg-white/5 backdrop-blur-2xl border-r border-white/10 flex-col h-screen fixed left-0 top-0 z-50">
 
         {/* Logo + Header */}
         <div className="px-6 pt-5 pb-6 border-b border-white/10 flex items-center gap-3">
-          <div className="w-9 h-9 bg-gradient-to-br from-[#adc6ff] to-[#6ffbbe] rounded-2xl flex items-center justify-center text-[#0b1326] font-bold text-2xl shadow-inner">L
+          <div className="w-9 h-9 bg-linear-to-br from-[#adc6ff] to-[#6ffbbe] rounded-2xl flex items-center justify-center text-[#0b1326] font-bold text-2xl shadow-inner">L
           </div>
             <Logo />
         </div>
