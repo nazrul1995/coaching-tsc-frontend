@@ -3,7 +3,7 @@ import React, { useState, } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, User, Calendar, LogOut, Menu, BookOpen, Plus, Trophy, Users } from 'lucide-react';
+import { LayoutDashboard, User, Calendar, LogOut, Menu, BookOpen, Plus, Trophy, Users, CreditCard } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,7 @@ export function AppSidebar() {
 
   const menuItems = [
     { label: "Overview", href: "/dashboard", key: "overview", roles: ["admin", "teacher", "student", "user"], icon: <LayoutDashboard size={20} /> },
+    { label: "Payments", href: "/dashboard/payments", key: "payments", roles: ["admin", "teacher"], icon: <CreditCard size={20} /> },
     { label: "My Courses", href: "/dashboard/course-management", key: "course-management", roles: ["teacher", "admin"], icon: <BookOpen size={20} /> },
     { label: "My Enrolled Courses", href: "/dashboard/enrolled-courses", key: "enrolled-courses", roles: ["student", "user"], icon: <BookOpen size={20} /> },
     { label: "Add Course", href: "/dashboard/add-course", key: "add-course", roles: ["teacher", "admin"], icon: <Plus size={20} /> },
