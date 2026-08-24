@@ -31,55 +31,61 @@ const demoAccounts: Record<
 
 const LoginContent = () => {
   const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm<LoginPayload>();
+  register,
+  handleSubmit,
+  setValue,
+  formState: { errors },
+} = useForm<LoginPayload>();
 
-  const router = useRouter();
-  const { login } = useAuth();
-  const params = useSearchParams();
+const router = useRouter();
+const { login } = useAuth();
+const params = useSearchParams();
 
-  const callbackUrl = params.get('callbackUrl') || '/';
+const callbackUrl = params.get('callbackUrl') || '/dashboard';
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: loginUser,
+const { mutate, isPending } = useMutation({
+  mutationFn: loginUser,
 
-    onSuccess: (data) => {
-      if (!data?.token || !data?.user) return;
-
-      // Save token in cookie for middleware
-      document.cookie = `token=${data.token}; path=/`;
-
-      login(data.token, data.user);
-
-      Swal.fire({
-        icon: 'success',
-        title: 'Login Successful 🎉',
-        text: `Welcome back, ${data.user.name}!`,
-        timer: 1200,
-        showConfirmButton: false,
-      });
-
-      router.push(callbackUrl);
-    },
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onError: (error: any) => {
+  onSuccess: (data) => {
+    if (!data?.success || !data?.token || !data?.user) {
       Swal.fire({
         icon: 'error',
         title: 'Login Failed',
-        text:
-          error.response?.data?.message ||
-          'Invalid email or password',
+        text: 'Invalid login response from server',
       });
-    },
-  });
 
-  const onSubmit = (formData: LoginPayload) => {
-    mutate(formData);
-  };
+      return;
+    }
+
+    // AuthContext:
+    // localStorage + state + frontend cookie
+    login(data.token, data.user);
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Login Successful 🎉',
+      text: `Welcome back, ${data.user.name}!`,
+      timer: 1200,
+      showConfirmButton: false,
+    }).then(() => {
+      router.replace(callbackUrl);
+    });
+  },
+
+  onError: (error: any) => {
+    Swal.fire({
+      icon: 'error',
+      title: 'Login Failed',
+      text:
+        error.response?.data?.message ||
+        'Invalid email or password',
+    });
+  },
+});
+
+const onSubmit = (formData: LoginPayload) => {
+  mutate(formData);
+};
 
   // Demo login
   const handleDemoLogin = (

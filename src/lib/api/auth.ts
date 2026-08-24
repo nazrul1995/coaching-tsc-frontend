@@ -22,7 +22,7 @@ export type User = {
   _id: string;
   email: string;
   name: string;
-  role: 'student' | 'teacher' | 'guardian' | 'admin';
+  role: 'student' | 'teacher' | 'admin';
   image?: string;
   createdAt?: string;
   updatedAt?: string;
