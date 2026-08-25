@@ -4,12 +4,10 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Users } from 'lucide-react';
 import Swal from 'sweetalert2';
 import axiosSecure from '@/lib/axiosSecure';
-
+import StudentTable, { APIStudent } from './StudentTable';
+import StudentStats from './StudentStats';
+import StudentFormModal from '../StudentFormModal';
 import { DashboardPageHeader, DashboardToolbar, SearchInput, FilterSelect, RefreshButton } from '@/components/dashboard/common';
-import StudentTable, { APIStudent } from '@/components/dashboard/addmin/add/student/student-management/StudentTable';
-import StudentFormModal from '@/components/dashboard/addmin/add/student/StudentFormModal';
-import StudentStats from '@/components/dashboard/addmin/add/student/student-management/StudentStats';
-// import StudentStats from '@/components/dashboard/addmin/add/student/student-management/StudentState';
 
 export default function StudentManagementPage() {
   const [students, setStudents] = useState<APIStudent[]>([]);
@@ -90,7 +88,7 @@ export default function StudentManagementPage() {
           <FilterSelect
             value={selectedClass}
             onChange={setSelectedClass}
-            options={[{ label: 'All Classes', value: 'ALL' }, ...['6', '7', '8', '9', '10', '11', '12'].map((cls) => ({ label: `Class ${cls}`, value: cls }))]}
+            options={[{ label: 'All Classes', value: 'ALL' }, ...['6','7','8','9','10','11','12'].map((cls) => ({ label: `Class ${cls}`, value: cls }))]}
           />
         </div>
       </DashboardToolbar>

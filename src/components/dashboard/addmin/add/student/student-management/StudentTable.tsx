@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Mail, Building2, Phone, Trash2, Edit3, Loader2 } from 'lucide-react';
+import { DashboardTableWrapper, EmptyState } from '@/components/dashboard/common';
 
 export interface APIStudent {
   _id: string;
@@ -14,7 +15,7 @@ export interface APIStudent {
   batch?: string;
   group?: string;
   photo?: string;
-  monthlyFee?:number;
+  monthlyFee?: number;
   admissionDate: string;
 }
 
@@ -27,95 +28,63 @@ interface StudentTableProps {
 
 export default function StudentTable({ students, deletingId, onEdit, onDelete }: StudentTableProps) {
   return (
-    <div className="rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm text-white/80">
-          <thead className="bg-white/5 border-b border-white/10 text-white/50 uppercase text-xs tracking-wider">
-            <tr>
-              <th className="px-6 py-4">Student Info</th>
-              <th className="px-6 py-4">Class & Group</th>
-              <th className="px-6 py-4">Institution</th>
-              <th className="px-6 py-4">Guardian Details</th>
-              <th className="px-6 py-4 text-right">Actions</th>
+    <DashboardTableWrapper>
+      <table className="w-full min-w-[850px] text-left text-sm text-white/80">
+        <thead className="border-b border-white/10 bg-white/5 text-xs uppercase tracking-wider text-white/50">
+          <tr>
+            <th className="px-6 py-4">Student Info</th>
+            <th className="px-6 py-4">Class &amp; Group</th>
+            <th className="px-6 py-4">Institution</th>
+            <th className="px-6 py-4">Guardian Details</th>
+            <th className="px-6 py-4 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-white/5">
+          {students.map((student) => (
+            <tr key={student._id} className="transition-colors hover:bg-white/5">
+              <td className="px-6 py-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/20 bg-gradient-to-tr from-blue-600 to-indigo-600 font-bold text-white">
+                    {student.photo ? <img src={student.photo} alt={student.name} className="h-full w-full object-cover" /> : student.name.charAt(0)}
+                  </div>
+                  <div>
+                    <div className="font-semibold text-white">{student.name}</div>
+                    <div className="mt-0.5 flex items-center gap-1 text-xs text-white/50">
+                      <Mail className="h-3 w-3 text-blue-400" /> {student.email}
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td className="px-6 py-4">
+                <div className="flex items-center gap-2">
+                  <span className="rounded-lg border border-blue-500/20 bg-blue-500/10 px-2.5 py-0.5 text-xs font-medium text-blue-400">Class {student.className}</span>
+                  <span className="text-xs uppercase text-white/50">{student.group || 'GENERAL'}</span>
+                </div>
+                {student.batch && <div className="mt-1 text-xs text-white/40">Batch: {student.batch}</div>}
+              </td>
+              <td className="px-6 py-4">
+                <div className="flex items-center gap-1.5 text-white/90">
+                  <Building2 className="h-3.5 w-3.5 shrink-0 text-white/40" />
+                  <span className="max-w-[200px] truncate">{student.institution}</span>
+                </div>
+              </td>
+              <td className="px-6 py-4">
+                <div className="text-white/90">{student.guradianName}</div>
+                <div className="mt-0.5 flex items-center gap-1 text-xs text-white/50"><Phone className="h-3 w-3" /> {student.phone}</div>
+              </td>
+              <td className="px-6 py-4 text-right">
+                <div className="flex items-center justify-end gap-2">
+                  <button type="button" onClick={() => onEdit(student)} className="cursor-pointer rounded-lg p-2 text-white/50 transition-colors hover:bg-blue-500/20 hover:text-blue-400" title="Edit Student"><Edit3 className="h-4 w-4" /></button>
+                  <button type="button" onClick={() => onDelete(student._id)} disabled={deletingId === student._id} className="cursor-pointer rounded-lg p-2 text-white/50 transition-colors hover:bg-rose-500/20 hover:text-rose-400 disabled:opacity-50" title="Delete Student">
+                    {deletingId === student._id ? <Loader2 className="h-4 w-4 animate-spin text-rose-400" /> : <Trash2 className="h-4 w-4" />}
+                  </button>
+                </div>
+              </td>
             </tr>
-          </thead>
-          <tbody className="divide-y divide-white/5">
-            {students.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="px-6 py-12 text-center text-white/40">
-                  No matching student records found.
-                </td>
-              </tr>
-            ) : (
-              students.map((student) => (
-                <tr key={student._id} className="hover:bg-white/5 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-white overflow-hidden border border-white/20 shrink-0">
-                        {student.photo ? (
-                          <img src={student.photo} alt={student.name} className="w-full h-full object-cover" />
-                        ) : (
-                          student.name.charAt(0)
-                        )}
-                      </div>
-                      <div>
-                        <div className="font-semibold text-white">{student.name}</div>
-                        <div className="text-xs text-white/50 flex items-center gap-1 mt-0.5">
-                          <Mail className="w-3 h-3 text-blue-400" /> {student.email}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-lg text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                        Class {student.className}
-                      </span>
-                      <span className="text-xs text-white/50 uppercase">{student.group || 'GENERAL'}</span>
-                    </div>
-                    {student.batch && <div className="text-xs text-white/40 mt-1">Batch: {student.batch}</div>}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-white/90 flex items-center gap-1.5">
-                      <Building2 className="w-3.5 h-3.5 text-white/40 shrink-0" />
-                      <span className="truncate max-w-[200px]">{student.institution}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-white/90">{student.guradianName}</div>
-                    <div className="text-xs text-white/50 flex items-center gap-1 mt-0.5">
-                      <Phone className="w-3 h-3" /> {student.phone}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={() => onEdit(student)}
-                        className="p-2 hover:bg-blue-500/20 rounded-lg text-white/50 hover:text-blue-400 transition-colors cursor-pointer"
-                        title="Edit Student"
-                      >
-                        <Edit3 className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => onDelete(student._id)}
-                        disabled={deletingId === student._id}
-                        className="p-2 hover:bg-rose-500/20 rounded-lg text-white/50 hover:text-rose-400 transition-colors cursor-pointer disabled:opacity-50"
-                        title="Delete Student"
-                      >
-                        {deletingId === student._id ? (
-                          <Loader2 className="w-4 h-4 animate-spin text-rose-400" />
-                        ) : (
-                          <Trash2 className="w-4 h-4" />
-                        )}
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
+          ))}
+        </tbody>
+      </table>
+      {students.length === 0 && <EmptyState title="No matching student records found" description="Try changing your search or class filter." />}
+    </DashboardTableWrapper>
   );
 }

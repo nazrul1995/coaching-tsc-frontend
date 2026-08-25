@@ -56,7 +56,7 @@ const menuItems: MenuItem[] = [
   },
   {
     label: "Payments",
-    href: "/dashboard/payments",
+    href: "/dashboard/admin/payments-management",
     key: "payments",
     roles: ["admin", "teacher"],
     icon: <CreditCard size={19} />,
@@ -81,41 +81,6 @@ const menuItems: MenuItem[] = [
     key: "add-course",
     roles: ["teacher", "admin"],
     icon: <Plus size={19} />,
-  },
-  {
-    label: "Schedule",
-    href: "/dashboard/schedule",
-    key: "schedule",
-    roles: ["teacher", "student"],
-    icon: <Calendar size={19} />,
-  },
-  {
-    label: "Student Results",
-    href: "/dashboard/student-results",
-    key: "student-results",
-    roles: ["teacher"],
-    icon: <Trophy size={19} />,
-  },
-  {
-    label: "Profile",
-    href: "/dashboard/profile",
-    key: "profile",
-    roles: ["admin", "teacher", "student", "user"],
-    icon: <User size={19} />,
-  },
-  {
-    label: "Admin Panel",
-    href: "/admin",
-    key: "admin",
-    roles: ["admin"],
-    icon: <Users size={19} />,
-  },
-  {
-    label: "Student Panel",
-    href: "/student",
-    key: "student",
-    roles: ["student"],
-    icon: <Users size={19} />,
   },
 ];
 
