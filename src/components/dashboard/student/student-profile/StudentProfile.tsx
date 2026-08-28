@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ArrowLeft, XCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useStudentDetails } from '@/hooks/useStudentDetails';
 import { StudentProfileTab } from '@/types/student';
@@ -10,15 +9,16 @@ import StudentResults from './StudentResults';
 import StudentFees from './StudentFees';
 import StudentInfo from './StudentInfo';
 import StudentProfileHeader from './StudentProfileHeader';
+import { XCircle } from 'lucide-react';
 
 
 interface StudentProfileProps {
-  studentId: string;
+  studentEmail?: string;
   showBackButton?: boolean;
 }
 
 export default function StudentProfile({
-  studentId,
+  studentEmail,
   showBackButton = true,
 }: StudentProfileProps) {
   const router = useRouter();
@@ -27,14 +27,14 @@ export default function StudentProfile({
     data,
     loading,
     error,
-  } = useStudentDetails(studentId);
+  } = useStudentDetails(studentEmail);
 
   const [activeTab, setActiveTab] =
     useState<StudentProfileTab>('overview');
 
   if (loading) {
     return (
-      <div className="flex min-h-[500px] items-center justify-center text-white">
+      <div className="flex min-h-125 items-center justify-center text-white">
         <div className="text-center">
           <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-white/10 border-t-[#6ffbbe]" />
 
@@ -70,7 +70,7 @@ export default function StudentProfile({
       </div>
     );
   }
-
+console.log(data)
   const {
     student,
     academicSummary,

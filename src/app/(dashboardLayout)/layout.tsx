@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { usePathname } from "next/navigation";
-import { Menu } from "lucide-react";
+import { Menu, MenuIcon } from "lucide-react";
 
 import {
   Breadcrumb,
@@ -75,9 +75,7 @@ export default function DashboardLayout({
 
         <header
           className="
-            sticky
-            top-0
-            z-40
+            sticky top-0 z-40
             flex
             h-14
             w-full
@@ -123,7 +121,7 @@ export default function DashboardLayout({
                 md:size-10
               "
             >
-              <Menu className="size-5" />
+              <MenuIcon className="size-5" />
             </button>
 
             {/* ===================================================

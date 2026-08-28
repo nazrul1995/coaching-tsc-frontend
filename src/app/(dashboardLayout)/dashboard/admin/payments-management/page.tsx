@@ -440,27 +440,15 @@ function Mini({
   );
 }
 
-function Row({
-  icon: Icon,
-  label,
-  value,
-  tone,
-}: {
-  icon: React.ElementType;
-  label: string;
-  value: React.ReactNode;
-  tone: string;
-}) {
+function Row({icon: Icon, label,value,tone,}: {icon: React.ElementType;label: string; value: React.ReactNode;tone: string;}) {
   return (
-    <div className="flex items-center justify-between rounded-2xl border border-white/5 bg-white/[0.025] p-3">
+    <div className="flex items-center justify-between rounded-2xl border border-white/5 bg-white/2.5 p-3">
       <div className="flex items-center gap-2">
         <Icon size={15} className={tone} />
-
         <span className="text-[11px] text-white/60">
           {label}
         </span>
       </div>
-
       <span className={`text-xs font-black ${tone}`}>
         {value}
       </span>

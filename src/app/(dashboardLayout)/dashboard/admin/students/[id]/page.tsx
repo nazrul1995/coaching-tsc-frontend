@@ -1,17 +1,25 @@
 import StudentProfile from "@/components/dashboard/student/student-profile/StudentProfile";
 
 interface PageProps {
-  params: Promise<{
-    id: string;
+  searchParams: Promise<{
+    studentEmail?: string;
   }>;
 }
 
 export default async function StudentProfilePage({
-  params,
+  searchParams,
 }: PageProps) {
-  const { id:studentId } = await params;
+  const { studentEmail } = await searchParams;
+
+  if (!studentEmail) {
+    return (
+      <div className="p-6 text-center text-white">
+        Student email পাওয়া যায়নি
+      </div>
+    );
+  }
 
   return (
-    <StudentProfile studentId={studentId} />
+    <StudentProfile studentEmail={studentEmail} />
   );
 }

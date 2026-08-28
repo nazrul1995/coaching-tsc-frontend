@@ -508,7 +508,6 @@ export default function StudentManagementPage() {
         onSubmit={handleSaveStudent}
         editStudent={editStudent}
       />
-
     </div>
   );
 }

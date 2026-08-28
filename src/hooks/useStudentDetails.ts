@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import axiosSecure from '@/lib/axiosSecure';
 import { StudentDetailsResponse } from '@/types/student';
 
-export function useStudentDetails(studentId?: string) {
+export function useStudentDetails(email?: string) {
   const [data, setData] =
     useState<StudentDetailsResponse | null>(null);
 
@@ -12,8 +12,8 @@ export function useStudentDetails(studentId?: string) {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!studentId) {
-      setError('Student ID পাওয়া যায়নি');
+    if (!email) {
+      setError('Student email পাওয়া যায়নি');
       setLoading(false);
       return;
     }
@@ -24,13 +24,20 @@ export function useStudentDetails(studentId?: string) {
         setError('');
 
         const response = await axiosSecure.get(
-          `/students/${studentId}/details`
+          '/students/details',
+          {
+            params: {
+              email,
+            },
+          }
         );
 
         const studentData = response.data?.data;
 
         if (!studentData) {
-          throw new Error('Student details পাওয়া যায়নি');
+          throw new Error(
+            'Student details পাওয়া যায়নি'
+          );
         }
 
         setData(studentData);
@@ -48,7 +55,7 @@ export function useStudentDetails(studentId?: string) {
     };
 
     fetchStudentDetails();
-  }, [studentId]);
+  }, [email]);
 
   return {
     data,

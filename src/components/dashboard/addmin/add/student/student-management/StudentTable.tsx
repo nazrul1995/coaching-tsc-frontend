@@ -47,13 +47,18 @@ export default function StudentTable({
 }: StudentTableProps) {
   const router = useRouter();
 
-  const handleViewProfile = (studentId: string) => {
-    router.push(`/dashboard/admin/students/${studentId}`);
-  };
+const handleViewProfile = (studentEmail: string) => {
+  router.push(
+    `/dashboard/admin/students/profile?studentEmail=${encodeURIComponent(
+      studentEmail
+    )}`
+  );
+};
+
 
   return (
     <DashboardTableWrapper>
-      <table className="w-full min-w-[850px] text-left text-sm text-white/80">
+      <table className="w-full min-w-212.5 text-left text-sm text-white/80">
         <thead className="border-b border-white/10 bg-white/5 text-xs uppercase tracking-wider text-white/50">
           <tr>
             <th className="px-6 py-4">Student Info</th>
@@ -157,7 +162,7 @@ export default function StudentTable({
                   {/* View Profile */}
                   <button
                     type="button"
-                    onClick={() => handleViewProfile(student._id)}
+                    onClick={() => handleViewProfile(student.email)}
                     className="cursor-pointer rounded-lg p-2 text-white/50 transition-colors hover:bg-emerald-500/20 hover:text-emerald-400"
                     title="View Student Profile"
                   >
