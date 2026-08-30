@@ -51,9 +51,9 @@ interface AppSidebarProps {
 
 const menuItems: MenuItem[] = [
   {
-    label: "Overview",
-    href: "/dashboard",
-    key: "overview",
+    label: "Profile",
+    href: "/dashboard/profile",
+    key: "profile",
     roles: ["admin", "teacher", "student", "user"],
     icon: <LayoutDashboard size={18} />,
   },
@@ -63,6 +63,13 @@ const menuItems: MenuItem[] = [
     href: "/dashboard/admin/payments-management",
     key: "payments",
     roles: ["admin", "teacher"],
+    icon: <CreditCard size={18} />,
+  },
+  {
+    label: "Payments History",
+    href: "/dashboard/student/student-payment",
+    key: "payments",
+    roles: ["student"],
     icon: <CreditCard size={18} />,
   },
 
