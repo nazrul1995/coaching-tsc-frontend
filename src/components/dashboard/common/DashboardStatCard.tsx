@@ -6,6 +6,7 @@ interface DashboardStatCardProps {
   value: string | number;
   subtitle?: string;
   icon: LucideIcon;
+  color?: string;
 
   accent?: 'blue' | 'green' | 'amber' | 'rose' | 'purple';
 

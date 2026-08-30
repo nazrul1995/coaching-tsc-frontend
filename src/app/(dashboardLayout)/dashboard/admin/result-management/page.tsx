@@ -143,7 +143,7 @@ console.log("selected exma",selectedExam)
   ).length;
 
   if (loading) {
-    return <LoadingState label="Loading exam results..." />;
+    return <LoadingState/>
   }
 
   return (

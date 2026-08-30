@@ -36,10 +36,3 @@ export const useIsAdmin = () => {
   return user?.role === 'admin';
 };
 
-/**
- * Hook to check if user is a guardian
- */
-export const useIsGuardian = () => {
-  const { user } = useAuth();
-  return user?.role === 'guardian';
-};
