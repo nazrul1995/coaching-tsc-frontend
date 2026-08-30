@@ -256,7 +256,7 @@ function SidebarNavigation({
 
       <div className="space-y-0.5">
         {items.map((item) => {
-          const hasChildren = !!item.children?.length;
+          const hren = !!item.children?.length;
 
           const childActive = item.children?.some(
             (child) =>
@@ -274,7 +274,7 @@ function SidebarNavigation({
           /* PARENT WITH CHILDREN                                          */
           /* ============================================================= */
 
-          if (hasChildren) {
+          if (hren) {
             return (
               <div key={item.key}>
                 <button
@@ -412,7 +412,7 @@ function SidebarNavigation({
                           return (
                             <SheetClose
                               key={child.key}
-                              asChild
+                              
                             >
                               <Link
                                 href={child.href}

@@ -143,7 +143,7 @@ console.log("selected exma",selectedExam)
   ).length;
 
   if (loading) {
-    return <LoadingState label="Loading exam results..." />;
+    return <LoadingState message="Loading exam results..." />;
   }
 
   return (
@@ -160,7 +160,7 @@ console.log("selected exma",selectedExam)
           value={selectedExam?.title || '—'}
           subtitle={selectedExam?.status || '—'}
           icon={ClipboardCheck}
-          color="blue"
+          accent="blue"
         />
 
         <DashboardStatCard
@@ -168,7 +168,7 @@ console.log("selected exma",selectedExam)
           value={String(results.length)}
           subtitle="Loaded result records"
           icon={ListChecks}
-          color="green"
+          accent="green"
         />
 
         <DashboardStatCard
@@ -176,7 +176,7 @@ console.log("selected exma",selectedExam)
           value={String(present)}
           subtitle="Students with marks"
           icon={Users}
-          color="blue"
+          accent="blue"
         />
 
         <DashboardStatCard
@@ -184,7 +184,7 @@ console.log("selected exma",selectedExam)
           value={String(absent)}
           subtitle="Absent records"
           icon={BarChart3}
-          color="rose"
+          accent="rose"
         />
       </DashboardStatGrid>
 

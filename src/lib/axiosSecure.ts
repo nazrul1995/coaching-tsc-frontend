@@ -1,3 +1,4 @@
+// frontend/src/axiosSecure.ts
 import axios from "axios";
 
 const axiosSecure = axios.create({
@@ -8,30 +9,26 @@ const axiosSecure = axios.create({
   withCredentials: true,
 });
 
-// Request interceptor
 axiosSecure.interceptors.request.use(
   (config) => {
-    // JWT is stored in HttpOnly cookie.
-    // Browser automatically sends the cookie.
-    console.log("Sending request:", config.method?.toUpperCase(), config.url);
-
+    // LocalStorage থেকে টোকেন নিয়ে Authorization হেডারে সেট করা
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("token");
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Response interceptor
 axiosSecure.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       console.log("Unauthorized request");
     }
-
     return Promise.reject(error);
   }
 );
