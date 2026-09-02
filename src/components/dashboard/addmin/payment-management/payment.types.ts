@@ -5,12 +5,27 @@ export interface StudentInfo {
   email?: string;
   phone?: string;
   className?: string;
+  admissionDate?: string;
+  monthlyFee?: number;
+}
+
+export interface FeeSummary {
+  totalAmount: number;
+  totalPaid: number;
+  totalCycles: number;
+  overdueCycles: number;
+  lastPaymentDate?: string;
+  studentId: string;
+  student?: StudentInfo;
+  totalOutstanding: number;
+  status: "unpaid" | "partial" | "paid" | "overdue" | string;
+
 }
 
 export interface FeeCycle {
   _id: string;
   student?: StudentInfo;
-  studentId?: StudentInfo;
+  studentId?: string;
   amount: number;
   paidAmount: number;
   dueAmount?: number;
