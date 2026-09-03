@@ -1,5 +1,4 @@
 import HeroBanner from "@/components/pages/Home/banner";
-import CoursesSection from "@/components/pages/Home/course";
 import Gallery from "@/components/pages/Home/gallery";
 import Leaderboard from "@/components/pages/Home/leaderboard";
 import Stats from "@/components/pages/Home/statistics";
@@ -14,16 +13,13 @@ export default function Home() {
         <HeroBanner />
       </section>
       <section>
+        <Leaderboard />
+      </section>
+      <section>
         <Stats />
       </section>
       <section>
-        <CoursesSection />
-      </section>
-      <section>
         <WhyChooseUs />
-      </section>
-      <section>
-        <Leaderboard />
       </section>
       <section>
         <Gallery />

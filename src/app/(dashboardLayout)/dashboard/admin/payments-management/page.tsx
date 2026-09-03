@@ -17,9 +17,11 @@ import Swal from 'sweetalert2';
 import axiosSecure from '@/lib/axiosSecure';
 
 import {
+  FeeCycle,
   FeeSummary,
   formatMoney,
   PaymentCollectionModal,
+  PaymentFormState,
   PaymentStats,
   PaymentTable,
 } from '@/components/dashboard/addmin/payment-management';
@@ -32,22 +34,8 @@ import {
   RefreshButton,
   SearchInput,
 } from '@/components/dashboard/common';
-import StudentPaymentHistory from '@/components/dashboard/common/StPaymentHistory';
-import { useStudentPaymentHistory } from '@/hooks/useStudentDetails';
 
 
-
-/* -------------------------------------------------------------------------- */
-/* Types                                                                      */
-/* -------------------------------------------------------------------------- */
-
-interface PaymentFormState {
-  studentId: string;
-  amount: string;
-  paymentMethod: string;
-  trxId: string;
-  remarks: string;
-}
 
 /* -------------------------------------------------------------------------- */
 /* Page                                                                       */
@@ -102,7 +90,7 @@ export default function PaymentsPage() {
   /* ---------------------------------------------------------------------- */
 
   const [fee, setFee] =
-    useState<FeeSummary | null>(null);
+    useState<FeeCycle | null>(null);
 
   const [open, setOpen] =
     useState(false);
@@ -371,33 +359,101 @@ export default function PaymentsPage() {
   /* Open Collection Modal                                                 */
   /* ---------------------------------------------------------------------- */
 
-  const openCollect = (
-    selected: FeeSummary | null = null
-  ) => {
-    setFee(selected);
+const openCollect = (
+  selected: FeeSummary | null = null
+) => {
+  if (!selected) {
+    setFee(null);
 
     setForm({
-      studentId:
-        selected?.student?._id ||
-        selected?.studentId ||
-        '',
-
-      amount: selected
-        ? String(
-            Number(
-              selected.totalOutstanding ||
-                0
-            )
-          )
-        : '',
-
+      studentId: '',
+      amount: '',
       paymentMethod: 'cash',
       trxId: '',
       remarks: '',
     });
 
     setOpen(true);
+
+    return;
+  }
+
+  /*
+   * FeeSummary → FeeCycle
+   *
+   * PaymentTable summary data পাঠায়।
+   * Collection modal cycle-shaped data নেয়।
+   */
+  const cycle: FeeCycle = {
+    _id: selected.studentId,
+
+    studentId:
+      selected.studentId,
+
+    student:
+      selected.student,
+
+    amount:
+      Number(
+        selected.totalAmount || 0
+      ),
+
+    paidAmount:
+      Number(
+        selected.totalPaid || 0
+      ),
+
+    dueAmount:
+      Number(
+        selected.totalOutstanding || 0
+      ),
+
+    status:
+      selected.status,
+
+    totalAmount:
+      selected.totalAmount,
+
+    totalPaid:
+      selected.totalPaid,
+
+    totalOutstanding:
+      selected.totalOutstanding,
+
+    totalCycles:
+      selected.totalCycles,
+
+    overdueCycles:
+      selected.overdueCycles,
+
+    lastPaymentDate:
+      selected.lastPaymentDate,
   };
+
+  setFee(cycle);
+
+  setForm({
+    studentId:
+      selected.student?._id ||
+      selected.studentId ||
+      '',
+
+    amount: String(
+      Number(
+        selected.totalOutstanding || 0
+      )
+    ),
+
+    paymentMethod: 'cash',
+
+    trxId: '',
+
+    remarks: '',
+  });
+
+  setOpen(true);
+};
+
 
   /* ---------------------------------------------------------------------- */
   /* Close Collection Modal                                                */

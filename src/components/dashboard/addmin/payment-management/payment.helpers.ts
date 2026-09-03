@@ -9,8 +9,11 @@ export const formatDate = (dateStr?: string) => {
 
 export const formatMoney = (amount: number = 0) => `৳${Number(amount || 0).toLocaleString()}`;
 
-export const getStudent = (fee: FeeCycle): StudentInfo | undefined => fee.student || fee.studentId;
-
+export const getStudent = (
+  fee: FeeCycle
+): StudentInfo | undefined => {
+  return fee.student;
+};
 export const getDueAmount = (fee: FeeCycle) => fee.dueAmount ?? Math.max(0, Number(fee.amount || 0) - Number(fee.paidAmount || 0));
 
 export const getInitials = (name?: string) => name

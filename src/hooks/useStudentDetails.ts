@@ -105,7 +105,7 @@ export const useStudentPaymentHistory = (userId?: string) => {
       }
     };
 
-    fetchPaymentHistory(userId);
+    fetchPaymentHistory();
   }, [userId]);
 
   return {
