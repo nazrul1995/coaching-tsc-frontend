@@ -33,6 +33,7 @@ import {
   SearchInput,
 } from '@/components/dashboard/common';
 import StudentPaymentHistory from '@/components/dashboard/common/StPaymentHistory';
+import { useStudentPaymentHistory } from '@/hooks/useStudentDetails';
 
 
 
@@ -155,10 +156,7 @@ export default function PaymentsPage() {
       /* Summary                                                         */
       /* -------------------------------------------------------------- */
 
-      const s =
-        summaryRes.data?.data ??
-        summaryRes.data ??
-        {};
+      const s = summaryRes.data?.data ?? summaryRes.data ?? {};
 
       const calculatedCollected =
         payments.reduce(
@@ -425,8 +423,7 @@ export default function PaymentsPage() {
   /* ---------------------------------------------------------------------- */
 
   const openHistory = (
-    studentId: string
-  ) => {
+    studentId: string) => {
     if (!studentId) return;
 
     setHistoryStudentId(
@@ -491,7 +488,7 @@ export default function PaymentsPage() {
     }
   };
 
-  /* ---------------------------------------------------------------------- */
+
   /* Submit Payment                                                         */
   /* ---------------------------------------------------------------------- */
 
@@ -691,21 +688,6 @@ export default function PaymentsPage() {
           ) : null
         }
       />
-
-      {/* ================================================================== */}
-      {/* HISTORY VIEW                                                       */}
-      {/* ================================================================== */}
-
-      {historyStudentId ? (
-        <StudentPaymentHistory
-          studentId={
-            historyStudentId
-          }
-          onBack={
-            closeHistory
-          }
-        />
-      ) : (
         <>
           {/* ============================================================ */}
           {/* PAYMENT STATS                                                */}
@@ -833,7 +815,6 @@ export default function PaymentsPage() {
             />
           </section>
         </>
-      )}
 
       {/* ================================================================== */}
       {/* PAYMENT COLLECTION MODAL                                          */}

@@ -26,6 +26,7 @@ import {
   SheetTrigger,
   SheetClose,
 } from "@/components/ui/sheet";
+import Logo from "../shared/logo/Logo";
 
 /* -------------------------------------------------------------------------- */
 /* TYPES                                                                      */
@@ -581,24 +582,7 @@ function LogoutButton({
 function SidebarBrand() {
   return (
     <div className="flex items-center px-5 py-5">
-      <Link
-        href="/dashboard"
-        className="flex items-center gap-3"
-      >
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#adc6ff] text-sm font-black text-[#0b1326]">
-          L
-        </div>
-
-        <div>
-          <div className="text-[17px] font-bold tracking-tight text-white">
-            Lens
-          </div>
-
-          <div className="text-[9px] font-medium uppercase tracking-[0.15em] text-white/25">
-            Coaching
-          </div>
-        </div>
-      </Link>
+     <Logo/>
     </div>
   );
 }

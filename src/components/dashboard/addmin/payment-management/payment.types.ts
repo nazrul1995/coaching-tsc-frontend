@@ -1,5 +1,6 @@
 export interface StudentInfo {
   _id: string;
+  userId: string;
   name?: string;
   roll?: string | number;
   email?: string;

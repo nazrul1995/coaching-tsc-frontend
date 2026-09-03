@@ -13,13 +13,13 @@ import {
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 
-import axiosSecure from '@/lib/axiosSecure';
 
 import {
   DashboardTableWrapper,
   LoadingState,
 } from '@/components/dashboard/common';
 import { formatDate, formatMoney } from '../addmin/payment-management';
+import { useStudentPaymentHistory } from '@/hooks/useStudentDetails';
 
 
 /* -------------------------------------------------------------------------- */
@@ -78,64 +78,7 @@ export default function StudentPaymentHistory({
   studentId,
   onBack,
 }: Props) {
-  const [data, setData] =
-    useState<StudentPaymentHistoryResponse | null>(null);
-
-  const [loading, setLoading] = useState(true);
-
-  /* ---------------------------------------------------------------------- */
-  /* Fetch History                                                          */
-  /* ---------------------------------------------------------------------- */
-
-  const fetchHistory = async () => {
-    if (!studentId) return;
-
-    setLoading(true);
-
-    try {
-      const response = await axiosSecure.get(
-        `/payments/student/${studentId}`
-      );
-
-      const result =
-        response.data?.data ??
-        response.data;
-
-      if (!result?.success) {
-        throw new Error(
-          'Unable to load payment history'
-        );
-      }
-
-      setData(result);
-    } catch (error) {
-      console.error(
-        'Payment history error:',
-        error
-      );
-
-      Swal.fire({
-        icon: 'error',
-        title: 'Unable to load history',
-        text:
-          'Student payment history could not be loaded.',
-        background: '#0b1326',
-        color: '#fff',
-        confirmButtonColor: '#6ffbbe',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchHistory();
-  }, [studentId]);
-
-  /* ---------------------------------------------------------------------- */
-  /* Loading                                                                */
-  /* ---------------------------------------------------------------------- */
-
+const {data:studentPaymentHistory,loading} = useStudentPaymentHistory(studentId);
   if (loading) {
     return (
       <LoadingState message="Loading payment history..." />
@@ -146,15 +89,14 @@ export default function StudentPaymentHistory({
   /* Empty                                                                  */
   /* ---------------------------------------------------------------------- */
 
-  if (!data) {
+  if (!studentPaymentHistory) {
     return null;
   }
-
   const {
     student,
     summary,
     history,
-  } = data;
+  } = studentPaymentHistory;
 
   const paidPercentage =
     summary.totalAmount > 0

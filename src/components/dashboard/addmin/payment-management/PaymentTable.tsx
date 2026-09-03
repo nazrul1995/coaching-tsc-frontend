@@ -24,6 +24,7 @@ import {
   DashboardTableWrapper,
   EmptyState,
 } from '../../common';
+import Link from 'next/link';
 
 interface Props {
   fees: FeeSummary[];
@@ -100,7 +101,7 @@ export default function PaymentTable({
               const isComplete = outstanding <= 0;
 
               const studentId =
-                student?._id ||
+                student?.userId ||
                 fee.studentId ||
                 '';
 
@@ -294,19 +295,15 @@ export default function PaymentTable({
                     <div className="flex items-center justify-end gap-2">
                       {/* History */}
 
-                      <button
+                      <Link
+                      href={`payments-management/${student?.userId}`}
                         type="button"
-                        onClick={() =>
-                          studentId &&
-                          onViewHistory(studentId)
-                        }
-                        disabled={!studentId}
                         title="View payment history"
                         className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[#adc6ff]/10 bg-[#adc6ff]/[0.05] px-3 text-[9px] font-black text-[#adc6ff] transition-all hover:border-[#adc6ff]/25 hover:bg-[#adc6ff]/10 disabled:cursor-not-allowed disabled:opacity-30"
                       >
                         <Eye size={12} />
                         History
-                      </button>
+                      </Link>
 
                       {/* Collect */}
 
@@ -374,10 +371,10 @@ export default function PaymentTable({
             outstanding <= 0;
 
           const studentId =
-            student?._id ||
+            student?.userId ||
             fee.studentId ||
             '';
-
+            console.log("Student ID:", student);
           return (
             <div
               key={studentId}

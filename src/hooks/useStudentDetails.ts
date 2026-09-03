@@ -3,11 +3,10 @@
 import { useEffect, useState } from 'react';
 import axiosSecure from '@/lib/axiosSecure';
 import { StudentDetailsResponse } from '@/types/student';
+import { StudentPaymentHistoryResponse } from '@/components/dashboard/common/StPaymentHistory';
 
 export function useStudentDetails(email?: string) {
-  const [data, setData] =
-    useState<StudentDetailsResponse | null>(null);
-
+  const [data, setData] =useState<StudentDetailsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -63,3 +62,57 @@ export function useStudentDetails(email?: string) {
     error,
   };
 }
+export const useStudentPaymentHistory = (userId?: string) => {
+  const [data, setData] = useState<StudentPaymentHistoryResponse | null>(null);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!userId) {
+      setError("Student ID পাওয়া যায়নি");
+      setLoading(false);
+      return;
+    }
+
+    const fetchPaymentHistory = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const response = await axiosSecure.get(
+          `/payments/student/${userId}`,
+        );
+
+        if (!response.data?.success) {
+          throw new Error(
+            response.data?.message ||
+              "Payment history পাওয়া যায়নি"
+          );
+        }
+
+        setData(response.data);
+      } catch (error: any) {
+        console.error(error);
+
+        setError(
+          error?.response?.data?.message ||
+            error?.message ||
+            "Payment history fetch করতে সমস্যা হয়েছে"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPaymentHistory(userId);
+  }, [userId]);
+
+  return {
+    data,
+    loading,
+    error,
+  };
+};
+
+

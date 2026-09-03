@@ -5,12 +5,14 @@ import StudentPaymentHistory from "@/components/dashboard/common/StPaymentHistor
 import { useAuth } from "@/context/AuthContext";
 
 const StudentPage = () => {
-  const {user, isLoading} = useAuth()
-  const studentId = user?._id
-  if(isLoading) return <LoadingState/>
+  const {user} = useAuth()
+  const id = user?._id
+ if (!id) {
+    return <LoadingState message="Loading student information..." />;
+  } 
   return (
     <div>
-      <StudentPaymentHistory studentId={studentId}/>
+      <StudentPaymentHistory studentId={id}/>
     </div>
   );
 };
