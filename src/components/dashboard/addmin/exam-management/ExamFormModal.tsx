@@ -1,645 +1,274 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
-import {
-  Loader2,
-  X,
-} from 'lucide-react';
+import React, { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { X, Loader2, BookOpen } from 'lucide-react';
+import { Exam } from '@/components/dashboard/addmin/exam-management';
 
-import {
-  ExamGroup,
-  ExamType,
-} from './exam.types';
-
-interface Props {
+interface ExamFormModalProps {
   open: boolean;
-
-  submitting?: boolean;
-
+  submitting: boolean;
+  initialData?: Exam | null;
   onClose: () => void;
-
-  onSubmit: (
-    payload: Record<string, unknown>,
-  ) => Promise<void> | void;
+  onSubmit: (payload: Record<string, unknown>) => Promise<void>;
 }
 
-// ======================================================
-// Initial Form
-// ======================================================
+interface ExamFormInputs {
+  title: string;
+  type: string;
+  className: string;
+  subject: string;
+  batch: string;
+  group: string;
+  totalMarks: number;
+  passMarks: number;
+  examDate: string;
+  description?: string;
+}
 
-const INITIAL_FORM = {
-  type: 'weekly' as ExamType,
-
+const defaultValues: ExamFormInputs = {
+  title: '',
+  type: 'weekly',
+  className: '',
   subject: '',
-
-  totalMarks: '100',
-
-  examDate: '',
-
-  className: '10',
-
-  batchYear: '2028',
-
-  group: 'science' as ExamGroup,
-
+  batch: '',
+  group: 'general',
+  totalMarks: 100,
+  passMarks: 40,
+  examDate: new Date().toISOString().split('T')[0],
   description: '',
 };
 
-// ======================================================
-// Exam Type Options
-// ======================================================
-
-const EXAM_TYPE_OPTIONS: [ExamType, string][] = [
-  ['weekly', 'Weekly Tutorial'],
-  ['model_test', 'Model Test'],
-];
-
-// ======================================================
-// Class Options
-// ======================================================
-
-const CLASS_OPTIONS = [
-  '6',
-  '7',
-  '8',
-  '9',
-  '10',
-  '11',
-  '12',
-];
-
-// ======================================================
-// Batch Year Options
-// ======================================================
-
-const BATCH_YEAR_OPTIONS = Array.from(
-  { length: 8 },
-  (_, index) =>
-    String(2026 + index),
-);
-
-// ======================================================
-// Component
-// ======================================================
-
 export default function ExamFormModal({
   open,
-  submitting = false,
+  submitting,
+  initialData,
   onClose,
   onSubmit,
-}: Props) {
-  const [form, setForm] =
-    useState(INITIAL_FORM);
+}: ExamFormModalProps) {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<ExamFormInputs>({
+    defaultValues,
+  });
 
-  // ==================================================
-  // Class 9-12 হলে batch/group দেখাবে
-  // ==================================================
+  // Handle Form Pre-fill for Edit or Reset for Create
+  useEffect(() => {
+    if (open) {
+      if (initialData) {
+        // Format ISO Date or timestamp string to YYYY-MM-DD format for <input type="date" />
+        const formattedDate = initialData.examDate
+          ? new Date(initialData.examDate).toISOString().split('T')[0]
+          : defaultValues.examDate;
 
-  const showBatchAndGroup = useMemo(() => {
-    return ['9', '10', '11', '12'].includes(
-      form.className,
-    );
-  }, [form.className]);
-
-  // ==================================================
-  // SSC / HSC
-  // ==================================================
-
-  const batchPrefix = useMemo(() => {
-    if (
-      form.className === '9' ||
-      form.className === '10'
-    ) {
-      return 'SSC';
+        reset({
+          title: initialData.title || '',
+          type: initialData.type || 'weekly',
+          className: initialData.className || '',
+          subject: initialData.subject || '',
+          batch: initialData.batch || '',
+          group: initialData.group || 'general',
+          totalMarks: initialData.totalMarks || 100,
+          examDate: formattedDate,
+          description: initialData.description || '',
+        });
+      } else {
+        reset(defaultValues);
+      }
     }
+  }, [open, initialData, reset]);
 
-    if (
-      form.className === '11' ||
-      form.className === '12'
-    ) {
-      return 'HSC';
-    }
+  if (!open) return null;
 
-    return '';
-  }, [form.className]);
-
-
-  // ==================================================
-  // Modal close
-  // ==================================================
-
-  if (!open) {
-    return null;
-  }
-
-  // ==================================================
-  // Generic field change
-  // ==================================================
-
-  const handleChange = (
-    field: keyof typeof form,
-    value: string,
-  ) => {
-    setForm((previous) => ({
-      ...previous,
-      [field]: value,
-    }));
-  };
-
-  // ==================================================
-  // Class Change
-  // ==================================================
-
-const handleClassChange = (className: string) => {
-  const normalizedClass = String(className);
-
-  const isHigherClass = [
-    '9',
-    '10',
-    '11',
-    '12',
-  ].includes(normalizedClass);
-
-  let defaultBatchYear = '2028';
-
-  if (
-    normalizedClass === '11' ||
-    normalizedClass === '12'
-  ) {
-    defaultBatchYear = '2027';
-  }
-
-  setForm((previous) => ({
-    ...previous,
-
-    // Always string
-    className: normalizedClass,
-
-    // 9-10 → SSC
-    // 11-12 → HSC
-    batchYear: isHigherClass
-      ? defaultBatchYear
-      : '',
-
-    // 6-8 হলে group লাগবে না
-    group: isHigherClass
-      ? previous.group || 'science'
-      : 'science',
-  }));
-};
-
-
-  // ==================================================
-  // Submit
-  // ==================================================
-
-  const handleSubmit = async (
-    event: React.FormEvent<HTMLFormElement>,
-  ) => {
-    event.preventDefault();
-
-    // ================================================
-    // Batch তৈরি
-    // ================================================
-
-    let batch: string | undefined;
-
-    if (showBatchAndGroup && batchPrefix) {
-      batch =
-        `${batchPrefix}-${form.batchYear}`;
-    }
-
-    // ================================================
-    // Backend payload
-    //
-    // IMPORTANT:
-    // title পাঠানো হচ্ছে না।
-    //
-    // Backend নিজে title তৈরি করবে।
-    // ================================================
-
-    const payload: Record<string, unknown> = {
-      type: form.type,
-
-      subject: form.subject.trim(),
-
-      totalMarks: Number(
-        form.totalMarks,
-      ),
-
-      examDate: form.examDate,
-
-      // Always string
-      className: String(
-        form.className,
-      ),
-
-      description:
-        form.description.trim() || undefined,
+  const handleFormSubmit = async (data: ExamFormInputs) => {
+    const payload = {
+      ...data,
+      totalMarks: Number(data.totalMarks),
+      passMarks: Number(data.passMarks),
     };
-
-    // ================================================
-    // Batch
-    // ================================================
-
-    if (batch) {
-      payload.batch = batch;
-    }
-
-    // ================================================
-    // Group
-    // ================================================
-
-    if (
-      showBatchAndGroup &&
-      form.group
-    ) {
-      payload.group = form.group;
-    }
-
-    // ================================================
-    // Submit
-    // ================================================
-
     await onSubmit(payload);
-
-    // ================================================
-    // Reset
-    // ================================================
-
-    setForm(INITIAL_FORM);
   };
+
+  const isEditMode = Boolean(initialData);
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/75 p-0 backdrop-blur-md sm:items-center sm:p-4">
-      <div className="max-h-[92vh] w-full overflow-y-auto rounded-t-[2rem] border border-white/10 bg-[#0b1326] shadow-2xl sm:max-w-2xl sm:rounded-[2rem]">
-
-        {/* ==================================================
-            Header
-        ================================================== */}
-
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/[0.07] bg-[#0b1326]/95 px-5 py-4 backdrop-blur-xl">
-
-          <div>
-            <h3 className="text-sm font-black text-white">
-              Create Exam
-            </h3>
-
-            <p className="text-[9px] text-white/30">
-              Exam title will be generated automatically
-            </p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl border border-white/10 bg-[#0b1326] p-6 text-white shadow-2xl md:p-8">
+        
+        {/* Modal Header */}
+        <div className="flex items-center justify-between border-b border-white/10 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#6ffbbe]/10 text-[#6ffbbe]">
+              <BookOpen size={20} />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-white">
+                {isEditMode ? 'Update Exam Details' : 'Create New Exam'}
+              </h2>
+              <p className="text-xs text-slate-400">
+                {isEditMode
+                  ? 'Modify exam details and save updates.'
+                  : 'Fill in the details to setup a new exam.'}
+              </p>
+            </div>
           </div>
-
           <button
             type="button"
             onClick={onClose}
-            className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 text-white/50 hover:bg-white/5 hover:text-white"
+            className="rounded-xl p-2 text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
           >
-            <X size={16} />
+            <X size={20} />
           </button>
         </div>
 
-        {/* ==================================================
-            Form
-        ================================================== */}
-
-        <form
-          onSubmit={handleSubmit}
-          className="grid gap-4 p-5 sm:grid-cols-2 sm:p-6"
-        >
-
-          {/* ==================================================
-              Exam Type
-          ================================================== */}
-
-          <SelectField
-            label="Exam Type"
-            value={form.type}
-            onChange={(value) =>
-              handleChange(
-                'type',
-                value,
-              )
-            }
-            options={EXAM_TYPE_OPTIONS}
-          />
-
-          {/* ==================================================
-              Subject
-          ================================================== */}
-
-          <Field
-            label="Subject"
-            value={form.subject}
-            onChange={(value) =>
-              handleChange(
-                'subject',
-                value,
-              )
-            }
-            placeholder="Mathematics"
-            required
-          />
-
-          {/* ==================================================
-              Total Marks
-          ================================================== */}
-
-          <Field
-            label="Total Marks"
-            type="number"
-            min="1"
-            value={form.totalMarks}
-            onChange={(value) =>
-              handleChange(
-                'totalMarks',
-                value,
-              )
-            }
-            required
-          />
-
-          {/* ==================================================
-              Exam Date
-          ================================================== */}
-
-          <Field
-            label="Exam Date"
-            type="date"
-            value={form.examDate}
-            onChange={(value) =>
-              handleChange(
-                'examDate',
-                value,
-              )
-            }
-            required
-          />
-
-          {/* ==================================================
-              Class
-          ================================================== */}
-
-          <SelectField
-            label="Class"
-            value={form.className}
-            onChange={handleClassChange}
-            options={CLASS_OPTIONS.map(
-              (className) => [
-                className,
-                `Class ${className}`,
-              ],
+        {/* Exam Form */}
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="mt-6 space-y-4">
+          {/* Title */}
+          <div>
+            <label className="mb-1 block text-xs font-medium text-slate-300">Exam Title *</label>
+            <input
+              type="text"
+              {...register('title', { required: 'Title is required' })}
+              placeholder="e.g. Weekly Model Test - 01"
+              className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-[#6ffbbe] focus:outline-none"
+            />
+            {errors.title && (
+              <span className="text-xs text-red-400">{errors.title.message}</span>
             )}
-          />
+          </div>
 
-          {/* ==================================================
-              Batch Year
-          ================================================== */}
-
-          {showBatchAndGroup && (
-            <>
-              <SelectField
-                label={`Batch Year (${batchPrefix})`}
-                value={form.batchYear}
-                onChange={(value) =>
-                  handleChange(
-                    'batchYear',
-                    value,
-                  )
-                }
-                options={BATCH_YEAR_OPTIONS.map(
-                  (year) => [
-                    year,
-                    `${batchPrefix}-${year}`,
-                  ],
-                )}
-              />
-
-              {/* ==================================================
-                  Group
-              ================================================== */}
-
-              <SelectField
-                label="Group"
-                value={form.group}
-                onChange={(value) =>
-                  handleChange(
-                    'group',
-                    value,
-                  )
-                }
-                options={[
-                  [
-                    'science',
-                    'Science',
-                  ],
-                  [
-                    'commerce',
-                    'Commerce',
-                  ],
-                  [
-                    'humanities',
-                    'Humanities',
-                  ],
-                ]}
-              />
-            </>
-          )}
-
-          {/* ==================================================
-              Generated Series Preview
-          ================================================== */}
-
-          {showBatchAndGroup && (
-            <div className="sm:col-span-2 rounded-xl border border-[#6ffbbe]/10 bg-[#6ffbbe]/5 p-3">
-
-              <p className="text-[9px] font-bold uppercase tracking-wider text-[#6ffbbe]/50">
-                Exam Series
-              </p>
-
-              <p className="mt-1 text-xs font-bold text-white">
-                {form.type === 'weekly'
-                  ? 'Weekly Tutorial'
-                  : 'Model Test'}
-                {' · '}
-                Class {form.className}
-                {' · '}
-                {batchPrefix}-{form.batchYear}
-                {' · '}
-                {form.group}
-              </p>
-
-              <p className="mt-1 text-[9px] text-white/30">
-                Backend will automatically generate the
-                serial number.
-              </p>
+          {/* Type & Subject */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-slate-300">Exam Type *</label>
+              <select
+                {...register('type', { required: true })}
+                className="w-full rounded-2xl border border-white/10 bg-[#0b1326] px-4 py-2.5 text-sm text-white focus:border-[#6ffbbe] focus:outline-none"
+              >
+                <option value="weekly">Weekly Tutorial</option>
+                <option value="monthly">Monthly Exam</option>
+                <option value="model_test">Model Test</option>
+                <option value="term_final">Term Final</option>
+              </select>
             </div>
-          )}
 
-          {/* ==================================================
-              Description
-          ================================================== */}
+            <div>
+              <label className="mb-1 block text-xs font-medium text-slate-300">Subject *</label>
+              <input
+                type="text"
+                {...register('subject', { required: 'Subject is required' })}
+                placeholder="e.g. Physics"
+                className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-[#6ffbbe] focus:outline-none"
+              />
+              {errors.subject && (
+                <span className="text-xs text-red-400">{errors.subject.message}</span>
+              )}
+            </div>
+          </div>
 
-          <div className="sm:col-span-2">
+          {/* Class, Batch & Group */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-slate-300">Class *</label>
+              <input
+                type="text"
+                {...register('className', { required: 'Class is required' })}
+                placeholder="e.g. 10"
+                className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-[#6ffbbe] focus:outline-none"
+              />
+              {errors.className && (
+                <span className="text-xs text-red-400">{errors.className.message}</span>
+              )}
+            </div>
 
-            <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-white/40">
-              Description
-            </label>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-slate-300">Batch</label>
+              <input
+                type="text"
+                {...register('batch')}
+                placeholder="e.g. 2026"
+                className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-[#6ffbbe] focus:outline-none"
+              />
+            </div>
 
+            <div>
+              <label className="mb-1 block text-xs font-medium text-slate-300">Group</label>
+              <select
+                {...register('group')}
+                className="w-full rounded-2xl border border-white/10 bg-[#0b1326] px-4 py-2.5 text-sm text-white focus:border-[#6ffbbe] focus:outline-none"
+              >
+                <option value="general">General</option>
+                <option value="science">Science</option>
+                <option value="commerce">Business Studies</option>
+                <option value="arts">Humanities</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Total Marks, Pass Marks & Exam Date */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-slate-300">Total Marks *</label>
+              <input
+                type="number"
+                {...register('totalMarks', { required: true, min: 1 })}
+                className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-[#6ffbbe] focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-xs font-medium text-slate-300">Pass Marks *</label>
+              <input
+                type="number"
+                {...register('passMarks', { required: true, min: 0 })}
+                className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-[#6ffbbe] focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-[#slate-300] text-xs font-medium">Exam Date *</label>
+              <input
+                type="date"
+                {...register('examDate', { required: true })}
+                className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-[#6ffbbe] focus:outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="mb-1 block text-xs font-medium text-slate-300">Description / Instructions</label>
             <textarea
               rows={3}
-              value={form.description}
-              onChange={(event) =>
-                handleChange(
-                  'description',
-                  event.target.value,
-                )
-              }
-              placeholder="Optional exam description..."
-              className="w-full resize-none rounded-xl border border-white/10 bg-white/[0.035] px-3.5 py-3 text-xs text-white outline-none placeholder:text-white/20 focus:border-[#adc6ff]/40"
+              {...register('description')}
+              placeholder="Add exam instructions or notes..."
+              className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-[#6ffbbe] focus:outline-none"
             />
           </div>
 
-          {/* ==================================================
-              Actions
-          ================================================== */}
-
-          <div className="grid grid-cols-2 gap-2 pt-2 sm:col-span-2">
-
+          {/* Modal Actions */}
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
             <button
               type="button"
               onClick={onClose}
-              className="h-11 rounded-xl border border-white/10 text-xs font-bold text-white/50 hover:bg-white/5 hover:text-white"
+              className="rounded-2xl border border-white/10 px-5 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 transition-colors"
             >
               Cancel
             </button>
-
             <button
               type="submit"
               disabled={submitting}
-              className="flex h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#adc6ff] to-[#6ffbbe] text-xs font-black text-[#0b1326] disabled:opacity-50"
+              className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#adc6ff] to-[#6ffbbe] px-6 py-2.5 text-xs font-black text-[#0b1326] shadow-lg shadow-[#6ffbbe]/10 transition-transform active:scale-95 disabled:opacity-50"
             >
-
-              {submitting && (
-                <Loader2
-                  size={15}
-                  className="animate-spin"
-                />
-              )}
-
-              {submitting
-                ? 'Creating...'
-                : 'Create Exam'}
+              {submitting && <Loader2 size={16} className="animate-spin" />}
+              {isEditMode ? 'Update Exam' : 'Create Exam'}
             </button>
           </div>
         </form>
       </div>
-    </div>
-  );
-}
-
-// ======================================================
-// Input Field
-// ======================================================
-
-function Field({
-  label,
-  value,
-  onChange,
-  placeholder,
-  type = 'text',
-  required = false,
-  min,
-}: {
-  label: string;
-
-  value: string;
-
-  onChange: (
-    value: string,
-  ) => void;
-
-  placeholder?: string;
-
-  type?: string;
-
-  required?: boolean;
-
-  min?: string;
-}) {
-  return (
-    <div>
-
-      <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-white/40">
-        {label}
-      </label>
-
-      <input
-        required={required}
-        type={type}
-        min={min}
-        value={value}
-        placeholder={placeholder}
-        onChange={(event) =>
-          onChange(
-            event.target.value,
-          )
-        }
-        className="h-11 w-full rounded-xl border border-white/10 bg-white/[0.035] px-3.5 text-xs text-white outline-none placeholder:text-white/20 focus:border-[#adc6ff]/40"
-      />
-    </div>
-  );
-}
-
-// ======================================================
-// Select Field
-// ======================================================
-
-function SelectField({
-  label,
-  value,
-  onChange,
-  options,
-}: {
-  label: string;
-
-  value: string;
-
-  onChange: (
-    value: string,
-  ) => void;
-
-  options: string[][];
-}) {
-  return (
-    <div>
-
-      <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-white/40">
-        {label}
-      </label>
-
-      <select
-        value={value}
-        onChange={(event) =>
-          onChange(
-            event.target.value,
-          )
-        }
-        className="h-11 w-full cursor-pointer rounded-xl border border-white/10 bg-[#0b1326] px-3 text-xs text-white outline-none focus:border-[#adc6ff]/40"
-      >
-
-        {options.map(
-          ([optionValue, optionLabel]) => (
-            <option
-              key={optionValue}
-              value={optionValue}
-            >
-              {optionLabel}
-            </option>
-          ),
-        )}
-
-      </select>
     </div>
   );
 }

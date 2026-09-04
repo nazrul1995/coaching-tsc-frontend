@@ -47,7 +47,7 @@ const Leaderboard = () => {
 
   if (isLoading) {
     return (
-      <section className="min-h-[500px] bg-[#030712] py-16 text-white flex items-center justify-center">
+      <section className="min-h-[500px] py-16 text-white flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="relative h-12 w-12">
             <div className="absolute inset-0 rounded-full border-2 border-[#6ffbbe]/20 border-t-[#6ffbbe] animate-spin" />

@@ -19,10 +19,10 @@ export interface Exam {
 export interface EligibleStudent {
   _id: string;
   name: string;
-  photo?: string;
   className: string;
   batch?: string;
-  group?: string;
+  roll?: string | number;
+  studentId?: string | number;
 }
 
 export interface ExamResult {

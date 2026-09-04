@@ -20,11 +20,14 @@ export interface ExamResultRecord {
   isAbsent: boolean;
   remarks?: string;
   createdAt?: string;
+  marks?: number; 
+  status?: 'pending' | 'approved' | 'rejected'; // Optional field for result status
 }
 
 export interface LeaderboardRow {
   rank: number;
   student: ResultStudent;
+  marks?: number;
   totalMarks?: number;
   totalFullMarks?: number;
   percentage?: number;

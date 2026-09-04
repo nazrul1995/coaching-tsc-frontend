@@ -1,12 +1,198 @@
 'use client';
-import React from 'react';
-import { Calendar, Eye, ListChecks, Megaphone } from 'lucide-react';
-import { Exam } from './exam.types';
-import { examTypeLabel, formatExamDate } from './exam.helpers';
-import ExamStatusBadge from './ExamStatusBadge';
 
-interface Props { exams: Exam[]; onPublish:(exam:Exam)=>void; onOpen:(exam:Exam)=>void; onResults:(exam:Exam)=>void; }
-export default function ExamTable({ exams,onPublish,onOpen,onResults }:Props){
- return <div className="overflow-hidden rounded-3xl border border-white/[0.08] bg-white/[0.025]"><div className="overflow-x-auto"><table className="w-full min-w-[950px]"><thead><tr className="border-b border-white/[0.06] bg-white/[0.015]"><Th>Exam</Th><Th>Type</Th><Th>Class / Batch</Th><Th>Date</Th><Th>Marks</Th><Th>Status</Th><Th align="right">Actions</Th></tr></thead><tbody>{exams.map(exam=><tr key={exam._id} className="border-b border-white/[0.045] hover:bg-white/[0.025]"><td className="px-5 py-4"><p className="text-xs font-bold text-white">{exam.title}</p><p className="mt-0.5 text-[10px] text-white/30">{exam.subject}</p></td><td className="px-4 py-4 text-[10px] font-semibold text-white/55">{examTypeLabel(exam.type)}</td><td className="px-4 py-4"><p className="text-xs text-white/70">Class {exam.className}</p><p className="mt-0.5 text-[10px] text-white/30">{exam.batch || exam.group || 'All eligible students'}</p></td><td className="px-4 py-4 text-[10px] text-white/50"><span className="inline-flex items-center gap-1.5"><Calendar size={12} className="text-[#adc6ff]"/>{formatExamDate(exam.examDate)}</span></td><td className="px-4 py-4 text-right font-mono text-xs font-bold text-white">{exam.totalMarks}</td><td className="px-4 py-4"><ExamStatusBadge status={exam.status}/></td><td className="px-4 py-4"><div className="flex justify-end gap-1.5"><button title="View exam" onClick={()=>onOpen(exam)} className="rounded-xl border border-white/10 p-2 text-white/45 hover:bg-white/10 hover:text-white"><Eye size={14}/></button>{exam.status==='published' && <button title="Enter results" onClick={()=>onResults(exam)} className="rounded-xl border border-[#adc6ff]/10 bg-[#adc6ff]/5 p-2 text-[#adc6ff] hover:bg-[#adc6ff]/10"><ListChecks size={14}/></button>}{exam.status==='draft' && <button title="Publish exam" onClick={()=>onPublish(exam)} className="rounded-xl border border-[#6ffbbe]/10 bg-[#6ffbbe]/5 p-2 text-[#6ffbbe] hover:bg-[#6ffbbe]/10"><Megaphone size={14}/></button>}</div></td></tr>)}</tbody></table></div></div>
+import React from 'react';
+import {
+  Calendar,
+  CheckCircle,
+  Clock,
+  Edit,
+  Eye,
+  FileSpreadsheet,
+  Trash2,
+} from 'lucide-react';
+
+import { Exam } from '@/components/dashboard/addmin/exam-management';
+
+interface ExamTableProps {
+  exams: Exam[];
+  onPublish: (exam: Exam) => void;
+  onOpen: (exam: Exam) => void;
+  onResults: (exam: Exam) => void;
+  onEdit: (exam: Exam) => void;
+  onDelete: (exam: Exam) => void;
 }
-function Th({children,align='left'}:{children:React.ReactNode;align?:'left'|'right'}){return <th className={`px-4 py-3 text-${align} text-[9px] font-bold uppercase tracking-wider text-white/30`}>{children}</th>}
+
+export default function ExamTable({
+  exams,
+  onPublish,
+  onOpen,
+  onResults,
+  onEdit,
+  onDelete,
+}: ExamTableProps) {
+  return (
+    <div className="overflow-hidden rounded-3xl border border-white/10 bg-[#0b1326] shadow-xl">
+      <div className="overflow-x-auto">
+        <table className="w-full text-left text-sm text-slate-300">
+          <thead className="border-b border-white/10 bg-white/5 text-xs uppercase text-slate-400">
+            <tr>
+              <th scope="col" className="px-6 py-4 font-bold">
+                Exam Info
+              </th>
+              <th scope="col" className="px-6 py-4 font-bold">
+                Class & Batch
+              </th>
+              <th scope="col" className="px-6 py-4 font-bold">
+                Marks & Date
+              </th>
+              <th scope="col" className="px-6 py-4 font-bold">
+                Status
+              </th>
+              <th scope="col" className="px-6 py-4 text-right font-bold">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-white/5">
+            {exams.map((exam) => {
+              const isDraft = exam.status === 'draft';
+              const isPublished = exam.status === 'published';
+
+              return (
+                <tr
+                  key={exam._id}
+                  className="group transition-colors hover:bg-white/[0.02]"
+                >
+                  {/* Title & Subject */}
+                  <td className="px-6 py-4">
+                    <div className="font-bold text-white group-hover:text-[#6ffbbe] transition-colors">
+                      {exam.title}
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-slate-400 mt-1">
+                      <span className="capitalize">{exam.subject}</span>
+                      <span>•</span>
+                      <span className="rounded-md bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wider text-slate-300">
+                        {exam.type?.replace('_', ' ')}
+                      </span>
+                    </div>
+                  </td>
+
+                  {/* Class, Batch & Group */}
+                  <td className="px-6 py-4">
+                    <div className="text-sm font-medium text-white">
+                      Class {exam.className}
+                    </div>
+                    <div className="text-xs text-slate-400 mt-0.5">
+                      {exam.batch ? `Batch ${exam.batch}` : 'All Batches'}
+                      {exam.group && (
+                        <span className="capitalize"> ({exam.group})</span>
+                      )}
+                    </div>
+                  </td>
+
+                  {/* Marks & Date */}
+                  <td className="px-6 py-4">
+                    <div className="text-sm font-semibold text-white">
+                      {exam.totalMarks} Marks
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-0.5">
+                      <Calendar size={13} className="text-slate-500" />
+                      <span>
+                        {exam.examDate
+                          ? new Date(exam.examDate).toLocaleDateString(
+                              'en-US',
+                              {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                              }
+                            )
+                          : 'N/A'}
+                      </span>
+                    </div>
+                  </td>
+
+                  {/* Status */}
+                  <td className="px-6 py-4">
+                    {isPublished ? (
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-[#6ffbbe]/10 px-3 py-1 text-xs font-medium text-[#6ffbbe]">
+                        <CheckCircle size={12} />
+                        Published
+                      </span>
+                    ) : isDraft ? (
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-400">
+                        <Clock size={12} />
+                        Draft
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-500/10 px-3 py-1 text-xs font-medium text-slate-400">
+                        {exam.status}
+                      </span>
+                    )}
+                  </td>
+
+                  {/* Action Buttons */}
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex items-center justify-end gap-1.5">
+                      {/* Publish Button (Draft Only) */}
+                      {isDraft && (
+                        <button
+                          type="button"
+                          onClick={() => onPublish(exam)}
+                          title="Publish Exam"
+                          className="rounded-xl border border-[#6ffbbe]/20 bg-[#6ffbbe]/10 px-3 py-1.5 text-xs font-bold text-[#6ffbbe] hover:bg-[#6ffbbe]/20 transition-colors"
+                        >
+                          Publish
+                        </button>
+                      )}
+
+                      {/* Enter Results Button */}
+                      <button
+                        type="button"
+                        onClick={() => onResults(exam)}
+                        title="Enter / View Results"
+                        className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white transition-colors"
+                      >
+                        <FileSpreadsheet size={15} />
+                      </button>
+
+                      {/* View Workflow Panel */}
+                      <button
+                        type="button"
+                        onClick={() => onOpen(exam)}
+                        title="Workflow Overview"
+                        className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white transition-colors"
+                      >
+                        <Eye size={15} />
+                      </button>
+
+                      {/* Edit Exam */}
+                      <button
+                        type="button"
+                        onClick={() => onEdit(exam)}
+                        title="Edit Exam"
+                        className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 hover:text-blue-300 transition-colors"
+                      >
+                        <Edit size={15} />
+                      </button>
+
+                      {/* Delete Exam */}
+                      <button
+                        type="button"
+                        onClick={() => onDelete(exam)}
+                        title="Delete Exam"
+                        className="flex h-8 w-8 items-center justify-center rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-colors"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
