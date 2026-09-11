@@ -78,6 +78,7 @@ export default function StudentPaymentHistory({
   studentId,
   onBack,
 }: Props) {
+  console.log("StudentPaymentHistory component rendered with studentId:", studentId);
 const {data:studentPaymentHistory,loading} = useStudentPaymentHistory(studentId);
   if (loading) {
     return (

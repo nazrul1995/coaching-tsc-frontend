@@ -18,6 +18,7 @@ export interface StudentInfo {
 
 export interface FeeSummary {
   studentId: string;
+  userId?: string;
 
   student?: StudentInfo;
 

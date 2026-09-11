@@ -73,7 +73,6 @@ export default function ExamWorkflowPanel({
      * or selected exam changes.
      */
 
-    console.log(leaderboard)
     useEffect(() => {
         if (!open) return;
 
@@ -92,7 +91,7 @@ export default function ExamWorkflowPanel({
             const response = await axiosSecure.patch(
                 `/exams/results/${exam._id}/publish`,
             );
-
+            console.log('Publish response:', response.data);
             await Swal.fire({
                 icon: 'success',
                 title: 'Results published',
@@ -207,14 +206,14 @@ export default function ExamWorkflowPanel({
                         {/* Actions */}
                         <div className="mb-5 flex flex-wrap gap-2">
                             {exam.status === 'published' && (
-  <button
-    type="button"
-    onClick={onEnterResults}
-    className="flex h-10 items-center gap-2 rounded-xl bg-linear-to-r from-[#adc6ff] to-[#6ffbbe] px-4 text-xs font-black text-[#0b1326]"
-  >
-    Enter / Complete Results
-  </button>
-)}
+                                <button
+                                    type="button"
+                                    onClick={onEnterResults}
+                                    className="flex h-10 items-center gap-2 rounded-xl bg-linear-to-r from-[#adc6ff] to-[#6ffbbe] px-4 text-xs font-black text-[#0b1326]"
+                                >
+                                    Enter / Complete Results
+                                </button>
+                            )}
 
 
                             {exam.status === 'published' &&

@@ -104,7 +104,7 @@ export default function PaymentTable({
                 student?.userId ||
                 fee.studentId ||
                 '';
-
+                console.log("Student ID from table:", student?.userId);
               return (
                 <tr
                   key={studentId}
@@ -132,10 +132,13 @@ export default function PaymentTable({
                       </div>
 
                       <div className="min-w-0">
-                        <p className="max-w-[180px] truncate text-xs font-bold text-white">
+                        <Link
+                          href={`/dashboard/admin/payments-management/${student?.userId}`}
+                          className="max-w-[180px] truncate text-xs font-bold text-white"
+                        >
                           {student?.name?.trim() ||
                             'Unknown Student'}
-                        </p>
+                        </Link>
 
                         <p className="mt-1 max-w-[190px] truncate text-[9px] text-white/30">
                           {student?.email ||
@@ -296,7 +299,7 @@ export default function PaymentTable({
                       {/* History */}
 
                       <Link
-                      href={`payments-management/${student?.userId}`}
+                      href={`/dashboard/admin/payments-management/${student?.userId}`}
                         type="button"
                         title="View payment history"
                         className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[#adc6ff]/10 bg-[#adc6ff]/[0.05] px-3 text-[9px] font-black text-[#adc6ff] transition-all hover:border-[#adc6ff]/25 hover:bg-[#adc6ff]/10 disabled:cursor-not-allowed disabled:opacity-30"
@@ -374,7 +377,6 @@ export default function PaymentTable({
             student?.userId ||
             fee.studentId ||
             '';
-            console.log("Student ID:", student);
           return (
             <div
               key={studentId}

@@ -60,7 +60,7 @@ const Navbar = () => {
     { name: 'Events', href: '/events', private: false },
     { name: 'Notice Board', href: '/notice', private: false },
     { name: 'Free Exam', href: '/free-exam', private: true },
-    { name: 'Results', href: '/result', private: true },
+    { name: 'Results', href: '/result'},
   ];
 
   const renderLink = (link: typeof navLinks[number], isMobile = false) => {

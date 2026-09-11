@@ -2,18 +2,19 @@
 
 import React from "react";
 import Image from "next/image";
-import axiosSecure from "@/lib/axiosSecure";
+import { useRouter } from "next/navigation";
 import { useQuery as useTanstackQuery } from "@tanstack/react-query";
+import axiosSecure from "@/lib/axiosSecure";
 import {
   Trophy,
   Crown,
   Medal,
-  Sparkles,
+  Award,
   ArrowRight,
   TrendingUp,
-  Award,
+  Sparkles,
+  ChevronRight,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 interface Student {
   _id: string;
@@ -27,7 +28,9 @@ interface Student {
 interface LeaderboardItem {
   rank: number;
   student: Student;
-  averagePercentage: number;
+  totalObtainedMarks: number;
+  totalPossibleMarks: number;
+  overallPercentage: number;
   totalExams: number;
 }
 
@@ -37,156 +40,100 @@ const FALLBACK_IMAGE =
 const Leaderboard = () => {
   const router = useRouter();
 
-  const { data: leaderboard = [], isLoading } = useTanstackQuery<LeaderboardItem[]>({
-    queryKey: ["overall-leaderboard"],
-    queryFn: async () => {
-      const res = await axiosSecure.get("/exams/leaderboard/overall");
-      return res.data?.data || [];
-    },
-  });
+  const { data: leaderboard = [], isLoading } =
+    useTanstackQuery<LeaderboardItem[]>({
+      queryKey: ["overall-leaderboard"],
+      queryFn: async () => {
+        const res = await axiosSecure.get("/exams/leaderboard/overall");
+        return res.data?.data || [];
+      },
+    });
 
   if (isLoading) {
-    return (
-      <section className="min-h-[500px] py-16 text-white flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <div className="relative h-12 w-12">
-            <div className="absolute inset-0 rounded-full border-2 border-[#6ffbbe]/20 border-t-[#6ffbbe] animate-spin" />
-            <Trophy className="absolute inset-0 m-auto text-[#6ffbbe]" size={20} />
-          </div>
-          <p className="text-xs font-medium tracking-widest text-white/50 uppercase animate-pulse">
-            Loading Leaderboard...
-          </p>
-        </div>
-      </section>
-    );
+    return <LeaderboardSkeleton />;
   }
 
   if (!leaderboard.length) {
-    return (
-      <section className="bg-[#030712] py-16 px-4 text-white">
-        <div className="mx-auto max-w-sm text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl">
-            <Trophy className="text-[#6ffbbe]" size={28} />
-          </div>
-          <h2 className="text-2xl font-bold">Results Coming Soon</h2>
-          <p className="mt-2 text-xs text-white/50">
-            Published results and top rankers will appear here once exams are evaluated.
-          </p>
-        </div>
-      </section>
-    );
+    return <EmptyLeaderboard />;
   }
 
-  // Top 3 Students
-  const top1 = leaderboard.find((item) => item.rank === 1);
-  const top2 = leaderboard.find((item) => item.rank === 2);
-  const top3 = leaderboard.find((item) => item.rank === 3);
+  const topThree = leaderboard
+    .filter((item) => item.rank <= 3)
+    .sort((a, b) => a.rank - b.rank);
 
-  // Desktop ordering: 2nd, 1st, 3rd. Mobile ordering: 1st, 2nd, 3rd
-  const topThreeMobile = [top1, top2, top3].filter(Boolean) as LeaderboardItem[];
-  const remaining = leaderboard.filter((item) => item.rank > 3).slice(0, 7);
+  const remaining = leaderboard
+    .filter((item) => item.rank > 3)
+    .slice(0, 7);
 
   return (
-    <section className="relative overflow-hidden bg-[#030712] py-12 px-4 sm:px-6 md:py-20 text-white">
-      {/* Background Neon Blurs */}
-      <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-72 w-72 sm:h-96 sm:w-96 rounded-full bg-[#6ffbbe]/10 blur-[100px]" />
-      <div className="pointer-events-none absolute bottom-0 left-0 h-64 w-64 rounded-full bg-blue-600/10 blur-[100px]" />
+    <section className="relative overflow-hidden bg-[#020617] px-4 py-14 text-white sm:px-6 md:py-20">
+      {/* Background */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute left-1/2 top-[-180px] h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-emerald-400/[0.07] blur-[120px]" />
+        <div className="absolute bottom-[-150px] left-[-100px] h-[350px] w-[350px] rounded-full bg-blue-500/[0.06] blur-[120px]" />
+        <div className="absolute right-[-100px] top-[30%] h-[300px] w-[300px] rounded-full bg-purple-500/[0.04] blur-[120px]" />
+      </div>
 
-      <div className="relative z-10 mx-auto max-w-5xl">
-        {/* ================= HEADER ================= */}
-        <div className="mb-8 sm:mb-14 text-center">
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-[#6ffbbe]/30 bg-[#6ffbbe]/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[#6ffbbe] backdrop-blur-md mb-3">
-            <Sparkles size={12} className="animate-pulse" />
-            <span>Leaderboard</span>
+      <div className="relative z-10 mx-auto max-w-6xl">
+        {/* Header */}
+        <LeaderboardHeader />
+
+        {/* ================= PODIUM ================= */}
+        <div className="mx-auto mb-10 max-w-5xl">
+          <div className="grid gap-4 md:grid-cols-3 md:items-end md:gap-5">
+            {topThree.map((item) => (
+              <PodiumCard key={item.student._id} item={item} />
+            ))}
           </div>
-
-          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
-            Top{" "}
-            <span className="bg-gradient-to-r from-[#6ffbbe] via-[#a5f3fc] to-[#60a5fa] bg-clip-text text-transparent">
-              Performers
-            </span>
-          </h2>
-
-          <p className="mt-2 text-xs sm:text-sm text-white/50 max-w-xs sm:max-w-md mx-auto">
-            Honoring students leading the academic charts with outstanding performance.
-          </p>
         </div>
 
-        {/* ================= TOP 3 (MOBILE & DESKTOP RESPONSIVE) ================= */}
-        <div className="mb-8 space-y-3 md:space-y-0 md:grid md:grid-cols-3 md:gap-5 md:items-end">
-          {topThreeMobile.map((item) => (
-            <TopCard key={item.student._id} item={item} />
-          ))}
-        </div>
-
-        {/* ================= RANKINGS LIST (4-10) ================= */}
+        {/* ================= OTHER RANKINGS ================= */}
         {remaining.length > 0 && (
-          <div className="mt-6 space-y-2">
-            <div className="px-2 pb-1 text-[11px] font-semibold tracking-wider text-white/40 uppercase flex justify-between">
-              <span>Rank & Student</span>
-              <span>Performance</span>
+          <div className="mx-auto max-w-4xl">
+            <div className="mb-3 flex items-center justify-between px-2">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/30">
+                  Rankings
+                </p>
+                <h3 className="mt-1 text-sm font-bold text-white">
+                  Top performers
+                </h3>
+              </div>
+
+              <div className="flex items-center gap-1.5 text-[10px] font-medium text-white/30">
+                <TrendingUp size={12} />
+                Official results
+              </div>
             </div>
 
-            <div className="divide-y divide-white/[0.05] rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-xl overflow-hidden">
-              {remaining.map((item) => (
-                <div
+            <div className="overflow-hidden rounded-3xl border border-white/[0.08] bg-white/[0.025] shadow-2xl shadow-black/20 backdrop-blur-xl">
+              {remaining.map((item, index) => (
+                <RankingRow
                   key={item.student._id}
-                  className="flex items-center justify-between p-3 sm:p-4 hover:bg-white/[0.04] transition active:scale-[0.99]"
-                >
-                  {/* Student Info */}
-                  <div className="flex items-center gap-3 min-w-0">
-                    <span className="flex h-7 w-7 sm:h-8 sm:w-8 flex-shrink-0 items-center justify-center rounded-lg bg-white/5 text-xs font-extrabold text-white/60">
-                      #{item.rank}
-                    </span>
-
-                    <div className="relative h-10 w-10 sm:h-11 sm:w-11 flex-shrink-0 overflow-hidden rounded-xl border border-white/10">
-                      <Image
-                        src={item.student.photo || FALLBACK_IMAGE}
-                        alt={item.student.name}
-                        fill
-                        sizes="44px"
-                        className="object-cover"
-                      />
-                    </div>
-
-                    <div className="min-w-0">
-                      <h4 className="truncate text-xs sm:text-sm font-bold text-white">
-                        {item.student.name}
-                      </h4>
-                      <p className="text-[11px] text-white/40 truncate">
-                        Class {item.student.className}
-                        {item.student.group && ` • ${item.student.group}`}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Stats */}
-                  <div className="text-right flex-shrink-0 pl-2">
-                    <div className="text-sm sm:text-base font-extrabold text-[#6ffbbe]">
-                      {item.averagePercentage}%
-                    </div>
-                    <div className="text-[10px] text-white/40">
-                      {item.totalExams} {item.totalExams === 1 ? "Exam" : "Exams"}
-                    </div>
-                  </div>
-                </div>
+                  item={item}
+                  isLast={index === remaining.length - 1}
+                />
               ))}
             </div>
           </div>
         )}
 
-        {/* ================= FOOTER BUTTON ================= */}
-        <div className="mt-8 flex flex-col items-center gap-4">
+        {/* Footer */}
+        <div className="mt-10 flex flex-col items-center">
           <button
             onClick={() => router.push("/result")}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl border border-[#6ffbbe]/30 bg-[#6ffbbe]/10 px-6 py-3.5 text-xs font-bold text-[#6ffbbe] transition active:scale-95 hover:bg-[#6ffbbe]/20"
+            className="group inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-emerald-400/20 bg-emerald-400/[0.07] px-6 py-3.5 text-xs font-bold text-emerald-300 transition-all duration-300 hover:border-emerald-400/40 hover:bg-emerald-400/[0.12] hover:shadow-lg hover:shadow-emerald-400/10 active:scale-[0.98] sm:w-auto"
           >
             <span>View All Exam Results</span>
-            <ArrowRight size={16} />
+            <ArrowRight
+              size={15}
+              className="transition-transform group-hover:translate-x-1"
+            />
           </button>
 
-          <p className="flex items-center gap-1.5 text-[11px] text-white/40">
-            <TrendingUp size={13} /> Scores updated based on official published results
+          <p className="mt-4 flex items-center gap-1.5 text-[10px] text-white/25">
+            <Sparkles size={11} />
+            Rankings are calculated from official published results
           </p>
         </div>
       </div>
@@ -194,118 +141,302 @@ const Leaderboard = () => {
   );
 };
 
-export default Leaderboard;
+/* ======================================================
+   HEADER
+====================================================== */
 
-// ======================================================
-// TOP CARD COMPONENT (Optimized for Mobile Touch)
-// ======================================================
+function LeaderboardHeader() {
+  return (
+    <div className="mb-10 text-center sm:mb-14">
+      <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/[0.06] px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-emerald-300">
+        <Trophy size={12} />
+        Academic Leaderboard
+      </div>
 
-function TopCard({ item }: { item: LeaderboardItem }) {
-  const isFirst = item.rank === 1;
-  const isSecond = item.rank === 2;
+      <h2 className="text-3xl font-black tracking-tight sm:text-5xl">
+        Top{" "}
+        <span className="bg-gradient-to-r from-emerald-300 via-cyan-300 to-blue-400 bg-clip-text text-transparent">
+          Performers
+        </span>
+      </h2>
 
-  const cardStyle = isFirst
-    ? {
-        border: "border-amber-400/40",
-        bg: "bg-gradient-to-r md:bg-gradient-to-b from-amber-500/15 via-amber-500/5 to-transparent",
-        glow: "bg-amber-400/10",
-        badgeBg: "bg-amber-400 text-slate-950",
-        textColor: "text-amber-400",
-        barColor: "bg-amber-400",
-        icon: <Crown size={16} className="text-slate-950 fill-slate-950" />,
-        order: "md:order-2 md:-translate-y-2", // Desktop styling
-      }
-    : isSecond
-    ? {
-        border: "border-slate-300/30",
-        bg: "bg-gradient-to-r md:bg-gradient-to-b from-slate-300/10 via-slate-300/5 to-transparent",
-        glow: "bg-slate-300/10",
-        badgeBg: "bg-slate-200 text-slate-950",
-        textColor: "text-slate-200",
-        barColor: "bg-slate-300",
-        icon: <Medal size={16} />,
-        order: "md:order-1",
-      }
-    : {
-        border: "border-amber-700/40",
-        bg: "bg-gradient-to-r md:bg-gradient-to-b from-amber-700/10 via-amber-700/5 to-transparent",
-        glow: "bg-amber-700/10",
-        badgeBg: "bg-amber-600 text-white",
-        textColor: "text-amber-500",
-        barColor: "bg-amber-600",
-        icon: <Award size={16} />,
-        order: "md:order-3",
-      };
+      <p className="mx-auto mt-3 max-w-lg text-xs leading-5 text-white/35 sm:text-sm">
+        Celebrating students who are consistently performing at the highest
+        level across published examinations.
+      </p>
+    </div>
+  );
+}
+
+/* ======================================================
+   PODIUM CARD
+====================================================== */
+
+function PodiumCard({ item }: { item: LeaderboardItem }) {
+  const rank = item.rank;
+
+  const config =
+    rank === 1
+      ? {
+          wrapper:
+            "md:order-2 md:-translate-y-5 border-amber-300/30 bg-gradient-to-b from-amber-400/[0.13] via-amber-400/[0.04] to-transparent",
+          glow: "bg-amber-400/15",
+          badge: "bg-amber-300 text-amber-950",
+          icon: <Crown size={16} fill="currentColor" />,
+          accent: "text-amber-300",
+          ring: "ring-amber-300/20",
+          label: "Champion",
+        }
+      : rank === 2
+        ? {
+            wrapper:
+              "md:order-1 border-slate-300/20 bg-gradient-to-b from-slate-300/[0.09] via-slate-300/[0.025] to-transparent",
+            glow: "bg-slate-300/10",
+            badge: "bg-slate-200 text-slate-900",
+            icon: <Medal size={16} />,
+            accent: "text-slate-200",
+            ring: "ring-slate-300/20",
+            label: "Runner Up",
+          }
+        : {
+            wrapper:
+              "md:order-3 border-orange-500/20 bg-gradient-to-b from-orange-500/[0.08] via-orange-500/[0.025] to-transparent",
+            glow: "bg-orange-500/10",
+            badge: "bg-orange-500 text-white",
+            icon: <Award size={16} />,
+            accent: "text-orange-400",
+            ring: "ring-orange-500/20",
+            label: "Third Place",
+          };
 
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl border ${cardStyle.border} ${cardStyle.bg} ${cardStyle.order} p-4 backdrop-blur-xl transition active:scale-[0.98]`}
+      className={`group relative overflow-hidden rounded-[28px] border p-5 shadow-xl shadow-black/10 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 ${config.wrapper}`}
     >
-      {/* Background Accent Glow */}
-      <div className={`absolute -right-8 -top-8 h-24 w-24 rounded-full ${cardStyle.glow} blur-2xl`} />
+      {/* Glow */}
+      <div
+        className={`pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full blur-3xl ${config.glow}`}
+      />
 
-      <div className="flex md:flex-col items-center justify-between gap-3">
-        {/* Left Side (Mobile) / Top Side (Desktop): Avatar & Rank Badge */}
-        <div className="flex md:flex-col items-center gap-3 w-full min-w-0">
-          <div className="relative flex-shrink-0">
-            <div className="relative h-14 w-14 sm:h-16 sm:w-16 overflow-hidden rounded-xl border border-white/10 shadow-md">
-              <Image
-                src={item.student.photo || FALLBACK_IMAGE}
-                alt={item.student.name}
-                fill
-                sizes="64px"
-                className="object-cover"
-              />
-            </div>
+      {/* Rank */}
+      <div className="mb-5 flex items-center justify-between">
+        <span className="text-[10px] font-black uppercase tracking-[0.18em] text-white/25">
+          {config.label}
+        </span>
 
-            {/* Floating Rank Icon Badge */}
-            <div
-              className={`absolute -bottom-1.5 -right-1.5 flex h-6 w-6 items-center justify-center rounded-lg shadow-md font-extrabold text-xs ${cardStyle.badgeBg}`}
-            >
-              {cardStyle.icon}
-            </div>
+        <div
+          className={`flex h-8 w-8 items-center justify-center rounded-xl ${config.badge}`}
+        >
+          {config.icon}
+        </div>
+      </div>
+
+      {/* Student */}
+      <div className="flex items-center gap-4 md:flex-col md:text-center">
+        <div className="relative shrink-0">
+          <div
+            className={`relative h-[72px] w-[72px] overflow-hidden rounded-2xl ring-4 ${config.ring}`}
+          >
+            <Image
+              src={item.student.photo || FALLBACK_IMAGE}
+              alt={item.student.name}
+              fill
+              sizes="72px"
+              className="object-cover"
+            />
           </div>
 
-          {/* Student Info */}
-          <div className="min-w-0 flex-1 md:text-center">
-            <div className="inline-block md:hidden mb-0.5 text-[10px] font-bold uppercase tracking-wider text-white/40">
-              Rank #{item.rank}
-            </div>
-            <h3 className="truncate text-sm sm:text-base font-extrabold text-white">
-              {item.student.name}
-            </h3>
-            <p className="text-[11px] text-white/50 truncate">
-              Class {item.student.className} {item.student.batch && `• ${item.student.batch}`}
+          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-white/10 bg-[#07111f] px-2.5 py-1 text-[9px] font-black text-white/70 shadow-lg">
+            #{rank}
+          </div>
+        </div>
+
+        <div className="min-w-0 flex-1 md:w-full">
+          <h3 className="truncate text-base font-black text-white">
+            {item.student.name}
+          </h3>
+
+          <p className="mt-1 truncate text-[10px] text-white/35">
+            Class {item.student.className}
+            {item.student.group && ` • ${item.student.group}`}
+          </p>
+        </div>
+      </div>
+
+      {/* Score */}
+      <div className="mt-6 rounded-2xl border border-white/[0.06] bg-black/10 p-3.5">
+        <div className="flex items-end justify-between">
+          <div>
+            <p className="text-[9px] font-bold uppercase tracking-wider text-white/25">
+              Overall Score
+            </p>
+
+            <p className={`mt-1 text-2xl font-black ${config.accent}`}>
+              {item.overallPercentage.toFixed(2)}%
+            </p>
+          </div>
+
+          <div className="text-right">
+            <p className="text-[11px] font-bold text-white/70">
+              {item.totalObtainedMarks}
+              <span className="text-white/25">
+                {" "}
+                / {item.totalPossibleMarks}
+              </span>
+            </p>
+
+            <p className="mt-0.5 text-[9px] uppercase tracking-wider text-white/25">
+              Marks
             </p>
           </div>
         </div>
 
-        {/* Right Side (Mobile) / Bottom Side (Desktop): Score Stats */}
-        <div className="flex-shrink-0 md:w-full md:mt-3 md:pt-3 md:border-t md:border-white/10 text-right md:text-left">
-          <div className="flex md:items-end justify-between gap-4">
-            <div>
-              <p className="hidden md:block text-[10px] uppercase tracking-wider text-white/40">
-                Average Score
-              </p>
-              <p className={`text-base sm:text-xl font-extrabold ${cardStyle.textColor}`}>
-                {item.averagePercentage}%
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="text-xs sm:text-sm font-bold text-white">{item.totalExams}</p>
-              <p className="text-[9px] uppercase tracking-wider text-white/40">Exams</p>
-            </div>
-          </div>
+        {/* Progress */}
+        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
+          <div
+            className={`h-full rounded-full transition-all ${config.badge}`}
+            style={{
+              width: `${Math.min(item.overallPercentage, 100)}%`,
+            }}
+          />
+        </div>
 
-          {/* Progress Bar */}
-          <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-white/10">
-            <div
-              className={`h-full rounded-full ${cardStyle.barColor}`}
-              style={{ width: `${Math.min(item.averagePercentage, 100)}%` }}
-            />
-          </div>
+        <div className="mt-2 flex justify-between text-[9px] text-white/25">
+          <span>{item.totalExams} exams completed</span>
+          <span>Overall</span>
         </div>
       </div>
     </div>
   );
 }
+
+/* ======================================================
+   RANKING ROW
+====================================================== */
+
+function RankingRow({
+  item,
+  isLast,
+}: {
+  item: LeaderboardItem;
+  isLast: boolean;
+}) {
+  return (
+    <div
+      className={`group flex items-center gap-3 px-3 py-3.5 transition-colors hover:bg-white/[0.035] sm:px-5 ${
+        !isLast ? "border-b border-white/[0.05]" : ""
+      }`}
+    >
+      {/* Rank */}
+      <div className="flex w-8 shrink-0 justify-center sm:w-10">
+        <span className="text-xs font-black text-white/30">
+          #{item.rank}
+        </span>
+      </div>
+
+      {/* Avatar */}
+      <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-white/5">
+        <Image
+          src={item.student.photo || FALLBACK_IMAGE}
+          alt={item.student.name}
+          fill
+          sizes="44px"
+          className="object-cover"
+        />
+      </div>
+
+      {/* Student */}
+      <div className="min-w-0 flex-1">
+        <h4 className="truncate text-xs font-bold text-white sm:text-sm">
+          {item.student.name}
+        </h4>
+
+        <p className="mt-0.5 truncate text-[9px] text-white/30 sm:text-[10px]">
+          Class {item.student.className}
+          {item.student.group && ` • ${item.student.group}`}
+          {item.student.batch && ` • ${item.student.batch}`}
+        </p>
+      </div>
+
+      {/* Marks */}
+      <div className="hidden text-right sm:block">
+        <p className="text-[10px] font-bold text-white/60">
+          {item.totalObtainedMarks}/{item.totalPossibleMarks}
+        </p>
+
+        <p className="text-[8px] uppercase tracking-wider text-white/20">
+          Marks
+        </p>
+      </div>
+
+      {/* Percentage */}
+      <div className="w-[70px] shrink-0 text-right sm:w-[90px]">
+        <p className="text-sm font-black text-emerald-300 sm:text-base">
+          {item.overallPercentage.toFixed(2)}%
+        </p>
+
+        <p className="text-[8px] text-white/25">
+          {item.totalExams} {item.totalExams === 1 ? "exam" : "exams"}
+        </p>
+      </div>
+
+      {/* Arrow */}
+      <ChevronRight
+        size={14}
+        className="hidden text-white/15 transition-transform group-hover:translate-x-0.5 sm:block"
+      />
+    </div>
+  );
+}
+
+/* ======================================================
+   LOADING
+====================================================== */
+
+function LeaderboardSkeleton() {
+  return (
+    <section className="min-h-[600px] bg-[#020617] px-4 py-16 text-white">
+      <div className="mx-auto max-w-5xl animate-pulse">
+        <div className="mx-auto mb-12 h-7 w-40 rounded-full bg-white/5" />
+        <div className="mx-auto mb-3 h-12 w-72 rounded-xl bg-white/5" />
+        <div className="mx-auto mb-12 h-4 w-96 max-w-full rounded bg-white/5" />
+
+        <div className="grid gap-4 md:grid-cols-3">
+          {[1, 2, 3].map((item) => (
+            <div
+              key={item}
+              className="h-[300px] rounded-[28px] border border-white/5 bg-white/[0.02]"
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ======================================================
+   EMPTY
+====================================================== */
+
+function EmptyLeaderboard() {
+  return (
+    <section className="bg-[#020617] px-4 py-20 text-white">
+      <div className="mx-auto max-w-md text-center">
+        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl border border-emerald-400/10 bg-emerald-400/[0.05]">
+          <Trophy size={30} className="text-emerald-300/70" />
+        </div>
+
+        <h2 className="mt-6 text-2xl font-black">
+          Results Coming Soon
+        </h2>
+
+        <p className="mx-auto mt-2 max-w-sm text-xs leading-5 text-white/30">
+          Published results and top performers will appear here once
+          examinations are evaluated and published.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+export default Leaderboard;

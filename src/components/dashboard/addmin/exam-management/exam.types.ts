@@ -14,6 +14,9 @@ export interface Exam {
   group?: ExamGroup;
   status: ExamStatus;
   description?: string;
+  isGeneral?: boolean;
+  tutorialNumber?: number;
+  passMarks?: number;
 }
 
 export interface EligibleStudent {

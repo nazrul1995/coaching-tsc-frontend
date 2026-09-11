@@ -2,12 +2,12 @@ import StudentPaymentHistory from "@/components/dashboard/common/StPaymentHistor
 
 type Props = {
   params: Promise<{
-    id: string;
+    userId: string;
   }>;
 };
 
 export default async function Page({ params }: Props) {
-    const { id } = await params;
-  console.log("Student ID:", id);
-  return <StudentPaymentHistory studentId={id} />;
+  const { userId } = await params;
+  console.log("Student User ID:", userId);
+    return <StudentPaymentHistory studentId={userId} />;
 }
