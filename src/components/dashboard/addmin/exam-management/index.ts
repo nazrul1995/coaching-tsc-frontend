@@ -1,5 +1,4 @@
 // export { default as ExamManagementPage } from './ExamManagementPage';
-export { default as ExamResultManagementPage } from './ExamResultManagementPage';
 export { default as ExamResultEntry } from './ExamResultEntry';
 export { default as ExamResultTable } from './ExamResultTable';
 export { default as LeaderboardTable } from './LeaderboardTable';

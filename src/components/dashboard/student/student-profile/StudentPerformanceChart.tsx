@@ -27,6 +27,7 @@ interface StudentPerformanceChartProps {
 export default function StudentPerformanceChart({
   data,
 }: StudentPerformanceChartProps) {
+  console.log('Performance Data in Chart:', data); // Debugging line to check the data being passed
   return (
     <section className="rounded-3xl border border-white/[0.08] bg-white/[0.025] p-5 sm:p-6">
       <div className="mb-6 flex items-center justify-between">

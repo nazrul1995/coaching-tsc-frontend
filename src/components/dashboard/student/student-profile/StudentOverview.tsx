@@ -36,7 +36,7 @@ export default function StudentOverview({
         date: result.exam?.examDate,
       }));
   }, [results]);
-
+console.log('Performance Data:', results); // Debugging line to check the data being passed
   const attendanceData = [
     {
       name: 'Participated',
